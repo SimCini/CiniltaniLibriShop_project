@@ -50,13 +50,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ecommerce.urls'
+ROOT_URLCONF = 'ciniltanilibrishop.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR,'templates'), 
+            os.path.join(BASE_DIR,'templates'),
             os.path.join(BASE_DIR,'ecommerce/templates'),
         ],
         'APP_DIRS': True,
