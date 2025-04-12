@@ -1,10 +1,10 @@
 @charset "UTF-8";
-/*!
+/*
 * Start Bootstrap - Shop Homepage v5.0.6 (https://startbootstrap.com/template/shop-homepage)
 * Copyright 2013-2023 Start Bootstrap
 * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-shop-homepage/blob/master/LICENSE)
 */
-/*!
+/*
  * Bootstrap  v5.2.3 (https://getbootstrap.com/)
  * Copyright 2011-2022 The Bootstrap Authors
  * Copyright 2011-2022 Twitter, Inc.
@@ -142,7 +142,7 @@
 }
 
 .menu a:hover {
-  color: #0073e6;
+  color: #2061A2;
 }
 
 .icons {
@@ -160,7 +160,7 @@
   bottom: -4px;
   width: 0%;
   height: 2px;
-  background-color: #0073e6; /* Colore della linea */
+  background-color: #2061A2; 
   transition: width 0.3s ease-in-out;
 }
 
@@ -181,17 +181,25 @@
   border-radius: 4px;
 }
 
+#cerca:focus{
+  box-shadow : none;
+}
+
 .btn-search {
   padding: 6px 10px;
-  background-color: #2b5988;
-  border: none;
   color: white;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.btn-search:hover {
+#btn-cerca{
+  border-color: #2b5988;
+  text-decoration-color: #2061A2;
+}
+          
+#btn-cerca:hover{
   background-color: #3E3380;
+  border-color: #3E3380;
 }
 
 body {
