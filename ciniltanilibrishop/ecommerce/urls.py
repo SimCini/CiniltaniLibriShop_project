@@ -1,11 +1,14 @@
 from django.urls import path
-from ecommerce.views import chi_sono, catalogo_prodotti, dettaglio_prodotto
+from . import views
 
 
 app_name = 'ecommerce'
 
 urlpatterns = [
-    path('chi_sono',chi_sono, name='chi_sono'),
-    path('prodotti/', catalogo_prodotti, name='catalogo_prodotti'),
-    path('prodotti/<int:pk>/', dettaglio_prodotto, name='dettaglio_prodotto'),
+    path('login',views.login, name='login'),
+    path('registrati',views.registrati, name='registrati'),
+    path('chi_sono',views.chi_sono, name='chi_sono'),
+    path('catalogo/', views.catalogo, name='catalogo_prodotti'),
+    path('catalogo/<int:pk>/', views.dettaglio_prodotto, name='dettaglio_prodotto'),
+    path('contatti/',views.contatti, name='contatti'),
 ]

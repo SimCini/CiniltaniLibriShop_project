@@ -1,5 +1,5 @@
 from django.db import models
-from decimal import Decimal
+from django.contrib.auth.models import AbstractUser
 #installare cloudinary su django (pip install cloudinary django-cloudinary-storage)
 
 
@@ -7,28 +7,35 @@ class Prodotto(models.Model):
     CATEGORIE = [
         ('libri', 'Libri'),
         ('oggettistica', 'Oggettistica'),
-    ]
-
-    SOTTOCATEGORIE_LIBRI = [
-        ('vari', 'Vari'),
-        ('religiosi', 'Religiosi'),
-    ]
-
-    SOTTOCATEGORIE_OGGETTISTICA = [
         ('cereria', 'Cereria'),
         ('immaginette', 'Immaginette'),
         ('santa_messa', 'Ostie e vino per S. Messa'),
         ('incenso', 'Incenso e carboncini'),
         ('oratorio', 'Oratorio estivo'),
-        ('altro', 'Altro'),
+    ]
+
+    CLASSI_SPEDIZIONE = [
+        ('carboncini', 'Carboncini incenso'),
+        ('libri', 'Libri'),
+        ('oggettistica', 'Oggettistica'),
+        ('vino', 'Vino'),
     ]
 
     nome = models.CharField(max_length=120)
     descrizione = models.TextField(blank=True, null=True)
-    prezzo = models.DecimalField(max_digits=10, decimal_places=2)
-    foto = models.ImageField(upload_to="prodotti/")
     categoria = models.CharField(max_length=20, choices=CATEGORIE)
-    sottocategoria = models.CharField(max_length=30)
+
+    prezzo = models.DecimalField(max_digits=10, decimal_places=2)
+    prezzo_scontato = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    foto = models.ImageField(upload_to="prodotti/")
+    
+    lunghezza_cm = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    larghezza_cm = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    altezza_cm = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    peso_g = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    classe_spedizione = models.CharField(max_length=20, choices=CLASSI_SPEDIZIONE, blank=True, null=True)
+    
     quantita = models.PositiveSmallIntegerField()
     disponibile = models.BooleanField(default=True)
 
@@ -52,3 +59,21 @@ class ImmagineProdotto(models.Model):
 
     def __str__(self):
         return f"Immagine di {self.prodotto.nome}"
+    
+class Utente(AbstractUser):
+    RUOLI = [
+        ('amministratore', 'Amministratore'),
+        ('cliente', 'Cliente'),
+    ]
+
+    email = models.EmailField(unique=True)
+    nome = models.CharField(max_length=50, blank=True)
+    cognome = models.CharField(max_length=50, blank=True)
+    ruolo = models.CharField(max_length=20, choices=RUOLI, default='cliente')
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        verbose_name = "Utente"
+        verbose_name_plural = "Utenti"
