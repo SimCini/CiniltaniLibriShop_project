@@ -4,18 +4,27 @@
     <section class="py-5">
         <div class="container px-4 px-lg-5 mt-5">
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                {% for prodotto in prodotti %}
+                {% for prodotto in page_obj %}
                     <div class="col mb-5">
                         <div class="card h-100">
                             <!-- Product image-->
-                            <img class="card-img-top" src="{{prodotto.foto.url}}" alt="{{prodotto.nome}}_foto" />
+                            {% if prodotto.foto %}
+                                <img class="card-img-top" src="{{prodotto.foto.url}}" alt="{{prodotto.nome}}_foto" />
+                            {% else %}
+                                <img class="card-img-top" src="{% static 'assets/image-not-found.jpg' %}" alt="{{prodotto.nome}}_foto" />
+                            {% endif %}
                             <!-- Product details-->
                             <div class="card-body p-4">
                                 <div class="text-center">
                                     <!-- Product name-->
                                     <h5 class="fw-bolder">{{prodotto.nome}}</h5>
                                     <!-- Product price-->
-                                    ${{prodotto.prezzo_scontato}} - {{prodotto.prezzo}}
+                                    {% if prodotto.prezzo_scontato and prodotto.prezzo_scontato < prodotto.prezzo %}
+                                        <p class="text-muted"><del>€{{ prodotto.prezzo }}</del></p>
+                                        <p class="text-danger">€{{ prodotto.prezzo_scontato }}</p>
+                                    {% else %}
+                                        <p>€{{ prodotto.prezzo }}</p>
+                                    {% endif %}
                                 </div>
                             </div>
                             <!-- Product actions-->
@@ -25,6 +34,24 @@
                         </div>
                     </div>
                 {%endfor %}
+            </div>
+            <div class="paginazione">
+                <!-- Paginazione -->
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; Prima</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">Precedente</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}.
+                    </span>
+            
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">Successiva</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">Ultima &raquo;</a>
+                    {% endif %}
+                </span>
             </div>
         </div>
     </section>

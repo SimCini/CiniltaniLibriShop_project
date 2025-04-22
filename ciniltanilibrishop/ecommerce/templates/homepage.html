@@ -1,0 +1,80 @@
+{% extends "index.html" %}
+{% block content %}
+<!-- Hero -->
+<div class="hero d-flex justify-content-center align-items-center text-white text-center" style="background: #2069b1bd center/cover no-repeat; height: 70vh;">
+  <div style="padding: 2rem; border-radius: 1rem;">    
+    <h1 id="titolo" class="grande"><b><span class="bordato">CiniltaniLibriShop</span></b></h1>
+    <h3 class="bordato">Il libraio di casa tua</h3>
+  </div>
+</div>
+
+<!-- Categorie -->
+<div class="container text-center my-5">
+  <h2 class="mb-4">Sfoglia per categoria</h2>
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 category-card">
+        <img src="https://www.illibraio.it/wp-content/uploads/2021/05/Copertina-del-libro-La-lunga-notte-di-Parigi.jpg" class="card-img-top" alt="Romanzi">
+        <div class="card-body">
+          <h5 style="padding-top: 10px;" class="card-title">Romanzi</h5>
+          <a href="#" class="btn-scopri">Scopri</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 category-card">
+        <img src="https://www.deagostinilibri.it/uploads/2018/04/9788851157593_b1c87b0ba1c3371cfc83e37cdff78205.jpg" class="card-img-top" alt="Gialli">
+        <div class="card-body">
+          <h5 style="padding-top: 10px;" class="card-title">Gialli & Thriller</h5>
+          <a href="#" class="btn-scopri">Scopri</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 category-card">
+        <img src="https://giunti.it/cdn/shop/files/7e4329f19fc442a5a9c78b3067282c3e.jpg?v=1744594979" class="card-img-top" alt="Fantasy">
+        <div class="card-body">
+          <h5 class="card-title">Fantasy e Fantascienza</h5>
+          <a href="#" class="btn-scopri">Scopri</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container my-5">
+  <h2 class="text-center mb-4">Novità</h2>
+  <div id="carouselLibri" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner text-center">
+      <div class="carousel-item active">
+        <div class="img-box">
+          <img src="https://www.ciniltanilibrishop.it/wp-content/uploads/2025/04/Coprimessali-promozione-pasquale-400x400.png" alt="Libro 1">
+        </div>
+        <p class="mt-2">SCONTI PASQUALI</p>
+      </div>
+
+      <div class="carousel-item">
+        <div class="img-box">
+          <img src="https://www.lafeltrinelli.it/images/9788820077716_0_424_0_75.jpg" alt="Libro 2">
+        </div>
+        <p class="mt-2">"Un thriller avvincente che non ti lascia scappare."</p>
+      </div>
+    </div style="vertical-align:50%;" >
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselLibri" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselLibri" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</div>
+<script>
+  window.onload = function () {
+    const titolo = document.getElementById("titolo");
+    setTimeout(() => {
+      titolo.classList.remove("grande");
+      titolo.classList.add("normale");
+    }, 100); // attende 100ms per permettere al browser di applicare prima la classe grande
+  };
+</script>
+{% endblock %}

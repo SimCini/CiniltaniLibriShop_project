@@ -15,7 +15,7 @@ class Prodotto(models.Model):
     ]
 
     CLASSI_SPEDIZIONE = [
-        ('carboncini', 'Carboncini incenso'),
+        ('incenso-carboncini', 'Carboncini incenso'),
         ('libri', 'Libri'),
         ('oggettistica', 'Oggettistica'),
         ('vino', 'Vino'),

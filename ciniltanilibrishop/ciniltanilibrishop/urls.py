@@ -18,11 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from ciniltanilibrishop.views import index
+from ecommerce.views import homepage
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index, name='index'),
+    path('', homepage, name='homepage'),
     path('ecommerce/',include('ecommerce.urls', namespace='ecommerce')),
 ]
 
