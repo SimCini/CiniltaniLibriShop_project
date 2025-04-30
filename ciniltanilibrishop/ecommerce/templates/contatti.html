@@ -1,3 +1,43 @@
 {% extends "index.html" %}
 {% block content %}
+<div>
+    <h3 style="margin-top: 20px; color:#2061A2">Non hai trovato il libro desiderato?</h3>
+<center>
+    <h5 style="margin-top: 10px; margin-left: 10px;">Se hai bisogno di contattarmi per ulteriori informazioni chiama il numero <b>3382083677</b> o se preferisci mandami una mail all'indirizzo <b>info@ciniltanilibri.it</b>. <br><br>
+        <br>Sei in cerca di un libro in specifico ma non l'hai trovato? Perfetto <b>CLICCA SUL PULSANTE, COMPILA IL FORM E INVIA.</b></h5>
+    <button id="openFormBtn" style="margin-top: 10px;" class="btn-ovale">Cliccami</button>
+</center>
+</div>
+<div id="contactFormPopup" class="popup-form">
+<div class="form-content">
+  <span class="close-btn" id="closeFormBtn">&times;</span>
+  <center><h4>Modulo di Contatto</h4></center>
+    <form>
+      <label for="autore">Autore:</label><br>
+      <input type="text" id="autore" name="autore"><br><br>
+  
+      <label for="titolo">Titolo:</label><br>
+      <input type="text" id="titolo" name="titolo"><br><br>
+  
+      <label for="editore">Editore (opzionale):</label><br>
+      <input type="text" id="editore" name="editore"><br><br>
+
+      <label for="messaggio">Informazioni aggiuntive:</label><br>
+      <textarea id="messaggio" name="messaggio" rows="4" cols="40"></textarea><br><br>
+  
+      <center><button type="submit" class="btn-ovale">Invia</button></center>
+    </form>
+  </div>
+</div>
+  <script>
+    document.getElementById("openFormBtn").addEventListener("click", function () {
+      document.getElementById("contactFormPopup").style.display = "block";
+      this.style.display = "none";
+    });
+  
+    document.getElementById("closeFormBtn").addEventListener("click", function () {
+      document.getElementById("contactFormPopup").style.display = "none";
+      document.getElementById("openFormBtn").style.display = "inline-block";
+    });
+  </script>
 {% endblock content %}
