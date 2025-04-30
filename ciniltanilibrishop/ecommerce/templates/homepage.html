@@ -51,9 +51,9 @@
       </div>
   </div>
   <div class="row">
-      <div class="col-md-4" style="background-color:lightgrey;border-radius:10px;padding:75px;">
+      <div class="col-md-4">
           <a href="#" class="text-decoration-none" id="books-category">
-              <div class="category-card" style="background-image: url('/api/placeholder/400/200');">
+              <div class="category-card" style="background-image: url('');">
                   <div class="category-overlay">
                       <h3 class="category-title">Libri</h3>
                   </div>
@@ -62,7 +62,7 @@
       </div>
       <div class="col-md-4">
           <a href="#" class="text-decoration-none" id="candles-category">
-              <div class="category-card" style="background-image: url('/api/placeholder/400/200');">
+              <div class="category-card" style="background-image: url('');">
                   <div class="category-overlay">
                       <h3 class="category-title">Cereria</h3>
                   </div>
@@ -71,7 +71,7 @@
       </div>
       <div class="col-md-4">
           <a href="#" class="text-decoration-none" id="incense-category">
-              <div class="category-card" style="background-image: url('/api/placeholder/400/200');">
+              <div class="category-card" style="background-image: url('');">
                   <div class="category-overlay">
                       <h3 class="category-title">Incenso e Carboncini</h3>
                   </div>
@@ -110,7 +110,7 @@
   </div>
   <div class="row mt-4">
       <div class="col-md-12 text-center">
-          <button class="btn btn-primary btn-lg" id="view-all-btn">Visualizza Tutto il Catalogo</button>
+          <a class="btn btn-lg" style="background-color:#2061A2; color:white;" id="view-all-btn" href="{% url 'ecommerce:catalogo'%}">Visualizza Tutto il Catalogo</a>
       </div>
   </div>
 </section>
