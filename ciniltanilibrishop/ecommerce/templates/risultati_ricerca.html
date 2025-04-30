@@ -1,0 +1,74 @@
+{% extends "index.html" %}
+{% load static %}
+{% block content %}
+    <h2>Risultati della ricerca</h2>
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+            <h2 class="mb-4">Risultati per: "{{ request.GET.q }}"</h2>
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                {% for prodotto in page_obj %}
+                    <div class="col mb-5">
+                        <a href="#" style="text-decoration: none; color: black;">
+                            <div class="card h-100">
+                                <div class="prodotto-img">
+                                    {% if prodotto.foto %}
+                                        <img class="card-img-top" src="{{ prodotto.foto.url }}" alt="{{ prodotto.nome }}_foto" />
+                                    {% else %}
+                                        <img class="card-img-top" src="{% static 'assets/image-not-found.jpg' %}" alt="{{ prodotto.nome }}_foto" />
+                                    {% endif %}
+                                </div>
+                                <div class="card-body p-4" style="margin-bottom:70px">
+                                    <div class="text-center">
+                                        <h5 class="fw">{{ prodotto.nome }}</h5>
+                                    </div>
+                                    <div class="text-center">
+                                        {% if prodotto.prezzo_scontato and prodotto.prezzo_scontato < prodotto.prezzo %}
+                                            <div class="badge bg-success text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sconto</div>
+                                            <p class="text-muted" style="margin-bottom:0px;"><del>€{{ prodotto.prezzo }}</del></p>
+                                            <p style="font-size:20px"><b>€{{ prodotto.prezzo_scontato }}</b></p>
+                                        {% else %}
+                                            <p style="font-size:20px;"><b>€{{ prodotto.prezzo }}</b></p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent" style="position:absolute; bottom:0;">
+                                    <div class="text-center">
+                                        <a class="btn-scopri" href="#" style="display:block; margin-left:10px;">Aggiungi al carrello</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center">
+                        <p>Nessun prodotto trovato.</p>
+                    </div>
+                {% endfor %}
+            </div>
+    
+            {% if page_obj.has_other_pages %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}" class="page">&laquo;</a>
+                    {% else %}
+                        <span class="page disabled">&laquo;</span>
+                    {% endif %}
+    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="page current">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?q={{ request.GET.q }}&page={{ num }}" class="page">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+    
+                    {% if page_obj.has_next %}
+                        <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="page">&raquo;</a>
+                    {% else %}
+                        <span class="page disabled">&raquo;</span>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock content %}
