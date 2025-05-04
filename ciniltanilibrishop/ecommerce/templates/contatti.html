@@ -1,11 +1,49 @@
 {% extends "index.html" %}
 {% block content %}
+<div class="row mb-5">
+  <div class="col-md-4">
+      <div class="contact-card text-center">
+          <i class="fas fa-phone contact-icon"></i>
+          <h3>Telefono</h3>
+          <p>Sempre disponibile</p>
+          <p class="mt-3">
+              <a href="tel:+390123456789" class="btn-scopri">
+                  <i class="fas fa-phone me-2"></i>+39 3382083677
+              </a>
+          </p>
+      </div>
+  </div>
+  <div class="col-md-4">
+      <div class="contact-card text-center">
+          <i class="fas fa-envelope contact-icon"></i>
+          <h3>Email</h3>
+          <p>Ti risponderemo entro 24 ore</p>
+          <p class="mt-3">
+              <a href="mailto:info@ciniltanilibri.it" class="btn-scopri">
+                  <i class="fas fa-envelope me-2"></i>info@ciniltanilibri.it
+              </a>
+          </p>
+      </div>
+  </div>
+  <div class="col-md-4">
+      <div class="contact-card text-center">
+          <i class="fas fa-map-marker-alt contact-icon"></i>
+          <h3>Visita il Negozio</h3>
+          <p>Vieni a trovarci in sede</p>
+          <p class="mt-3">
+              <a href="https://maps.app.goo.gl/RT3auHyogxk6Xif97" target="_blank" class="btn-scopri">
+                  <i class="fas fa-directions me-2"></i>Indicazioni Stradali
+              </a>
+          </p>
+      </div>
+  </div>
+</div>
 <div>
-    <h3 style="margin-top: 20px; color:#2061A2">Non hai trovato il libro desiderato?</h3>
+    <h3 style="margin-top: 15x; color:#2061A2">Non hai trovato il libro desiderato?</h3>
 <center>
-    <h5 style="margin-top: 10px; margin-left: 10px;">Se hai bisogno di contattarmi per ulteriori informazioni chiama il numero <b>3382083677</b> o se preferisci mandami una mail all'indirizzo <b>info@ciniltanilibri.it</b>. <br><br>
-        <br>Sei in cerca di un libro in specifico ma non l'hai trovato? Perfetto <b>CLICCA SUL PULSANTE, COMPILA IL FORM E INVIA.</b></h5>
-    <button id="openFormBtn" style="margin-top: 10px;" class="btn-ovale">Cliccami</button>
+    <h5 style="margin-top: 10px; margin-left: 10px;">
+        Sei in cerca di un libro in specifico ma non l'hai trovato? Perfetto <b>CLICCA SUL PULSANTE, COMPILA IL FORM E INVIA.</b></h5>
+    <button id="openFormBtn" style="margin-top: 10px;margin-bottom: 35px;" class="btn-ovale">Cliccami</button>
 </center>
 </div>
 <div id="contactFormPopup" class="popup-form">

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+
 #installare cloudinary su django (pip install cloudinary django-cloudinary-storage)
 
 

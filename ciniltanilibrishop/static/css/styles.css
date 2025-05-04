@@ -247,6 +247,18 @@ margin-left: 20px;
   border-color: #3E3380;
 }
 
+#view-all-btn{
+  border-color: #2061A2;
+  color:white;
+  background-color: #2061A2; 
+  border-radius: 10px;;
+}
+
+#view-all-btn:hover{
+  background-color: #3E3380;
+  border-color: #3E3380;
+}
+
 .btn-ovale {
   padding: 10px 25px;
   background-color: #2061A2;
@@ -448,6 +460,52 @@ center h4, h1{
   color: white; /* testo bianco in hover */
 }
 /*fine sezione categorie*/
+
+.contact-card {
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+            background-color: var(--light);
+            transition: transform 0.3s;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+        
+        }
+      
+  .contact-icon {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+    color:#2061A2;
+}
+
+  .contact-info {
+    margin-bottom: 2rem;
+}
+
+.contact-info h5 {
+    color: var(--primary);
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.contact-info p {
+    margin-bottom: 0.5rem;
+}
+
+.contact-info a {
+    color: var(--secondary);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.contact-info a:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
 
 html body {
   margin: 0;
