@@ -1,3 +1,140 @@
 {% extends "index.html" %}
+{% load static %}
 {% block content %}
+<main>  
+    <div class="product-container">
+        <div class="product-gallery">
+            {% if prodotto.foto %}
+                <img class="main-image" src="{{prodotto.foto.url}}" alt="{{prodotto.nome}}_foto" />
+            {% else %}
+                <img class="main-image" src="{% static 'assets/image-not-found.jpg' %}" alt="{{prodotto.nome}}_foto" />
+            {% endif %}
+        </div>
+        
+        <div class="product-info">
+            <div>
+                <p class="product-category">{{prodotto.categoria}}</p>
+                <h1 class="product-title">{{prodotto.nome}}</h1>
+                
+                <div class="product-price">
+                    {% if prodotto.prezzo_scontato and prodotto.prezzo_scontato < prodotto.prezzo %}
+                        <span>{{prodotto.prezzo_scontato}}</span>
+                        <span class="old-price">{{prodotto.prezzo}}</span>
+                        <span class="discount-badge">-11%</span>
+                    {% else %}
+                        <span class="old-price">{{prodotto.prezzo}}</span>
+                    {% endif %}
+                </div>
+    
+            </div>
+            
+            <div>
+                <div class="quantity-selector">
+                    <button class="quantity-btn">-</button>
+                    <input type="number" class="quantity-input" value="1" min="1">
+                    <button class="quantity-btn">+</button>
+                </div>
+                
+                <div class="cta-buttons">
+                    <button class="add-to-cart">Aggiungi al Carrello</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="product-tabs">
+        <div class="tabs-header">
+            <button class="tab-btn active" data-tab="description">Descrizione</button>
+            <button class="tab-btn" data-tab="specifications">Specifiche</button>
+        </div>
+        
+        <div class="tab-content">
+            <div class="tab-panel active" id="description">
+                <h3>Descrizione</h3>
+                <p>{{prodotto.descrizione}}</p>
+            </div>
+            
+            <div class="tab-panel" id="specifications">
+                <table class="specs-table">
+                    <tr>
+                        <th>Titolo</th>
+                        <td>{{prodotto.nome}}</td>
+                    </tr>
+                    <tr>
+                        <th>Editore</th>
+                        <td>{{prodotto.editore}}</td>
+                    </tr>
+                    <tr>
+                        <th>Anno pubblicazione</th>
+                        <td>{{prodotto.anno}}</td>
+                    </tr>
+                    <tr>
+                        <th>ISBN</th>
+                        <td>{{prodotto.ISBN}}</td>
+                    </tr>
+                    <tr>
+                        <th>Quantità</th>
+                        <td>{{prodotto.quantita}}</td>
+                    </tr>
+                    <tr>
+                        <th>Dimensioni</th>
+                        <td>{{prodotto.larghezza_cm}} cm x {{prodotto.altezza_cm}} cm</td>
+                    </tr>
+                    <tr>
+                        <th>Peso</th>
+                        <td>{{prodotto.peso_g}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Tab functionality
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons and panels
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Add active class to clicked button and corresponding panel
+            button.classList.add('active');
+            const tabId = button.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+    
+    // Quantity selector
+    const minusBtn = document.querySelector('.quantity-btn:first-child');
+    const plusBtn = document.querySelector('.quantity-btn:last-child');
+    const quantityInput = document.querySelector('.quantity-input');
+    
+    minusBtn.addEventListener('click', () => {
+        const currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+        }
+    });
+    
+    plusBtn.addEventListener('click', () => {
+        const currentValue = parseInt(quantityInput.value);
+        quantityInput.value = currentValue + 1;
+    });
+    
+    // Thumbnail gallery
+    document.querySelectorAll('.thumbnail').forEach(thumb => {
+        thumb.addEventListener('click', () => {
+            document.querySelectorAll('.thumbnail').forEach(t => {
+                t.classList.remove('active');
+            });
+            thumb.classList.add('active');
+            document.querySelector('.main-image').src = thumb.src.replace('80/80', '500/650');
+        });
+    });
+</script>
 {% endblock content %}
