@@ -43,7 +43,7 @@ class Command(BaseCommand):
         with open(path, newline='', encoding='utf-8-sig') as file:
             reader = csv.DictReader(file)
             reader.fieldnames = [h.strip() for h in reader.fieldnames]
-            creati, esistenti, errori = 0, 0, 0
+            creati, esistenti, errori, aggiornati = 0, 0, 0, 0
 
             for i, row in enumerate(reader, start=1):
                 nome = row.get('post_title', '').strip()
@@ -56,8 +56,15 @@ class Command(BaseCommand):
                 altezza = self.parse_decimal(row.get('height'))
                 peso = self.parse_decimal(row.get('weight'))
 
-                categoria_raw = row.get('tax:product_cat', '').strip()
-                categoria = CATEGORIE_MAPPA.get(categoria_raw, 'oggettistica')
+                #categoria_raw = row.get('tax:product_cat', '').strip()
+                #categoria = CATEGORIE_MAPPA.get(categoria_raw, 'oggettistica')
+                categoria_raw = row.get('tax:product_cat', '')
+                
+                def normalizza(testo):
+                    return testo.lower().strip().replace('  ', ' ').replace('ò', 'o').replace('à', 'a')
+                
+                categoria_norm = normalizza(categoria_raw)
+                categoria = {normalizza(k): v for k, v in CATEGORIE_MAPPA.items()}.get(categoria_norm, 'oggettistica')
 
                 classe_raw = row.get('tax:product_shipping_class', '').strip()
                 classe_spedizione = CLASSE_SPEDIZIONE_MAPPA.get(classe_raw, None)
@@ -78,37 +85,46 @@ class Command(BaseCommand):
                     errori += 1
                     continue
 
-                prodotto, creato = Prodotto.objects.get_or_create(
-                    nome=nome,
-                    defaults={
-                        'descrizione': descrizione,
-                        'categoria': categoria,
-                        'classe_spedizione': classe_spedizione,
-                        'prezzo': prezzo,
-                        'prezzo_scontato': prezzo_scontato if prezzo_scontato else prezzo,
-                        'lunghezza_cm': lunghezza,
-                        'larghezza_cm': larghezza,
-                        'altezza_cm': altezza,
-                        'peso_g': peso,
-                        'quantita': quantita,
-                        'disponibile': disponibile,
-                    }
-                )
+                prodotto, creato = Prodotto.objects.get_or_create(nome=nome)
+
+                if creato:
+                    prodotto.descrizione = descrizione
+                    prodotto.categoria = categoria
+                    prodotto.classe_spedizione = classe_spedizione
+                    prodotto.prezzo = prezzo
+                    prodotto.prezzo_scontato = prezzo_scontato if prezzo_scontato else prezzo
+                    prodotto.lunghezza_cm = lunghezza
+                    prodotto.larghezza_cm = larghezza
+                    prodotto.altezza_cm = altezza
+                    prodotto.peso_g = peso
+                    prodotto.quantita = quantita
+                    prodotto.disponibile = disponibile
+                    prodotto.save()
+                    creati += 1
+                    self.stdout.write(f"✅ Creato: {nome}")
+                else:
+                    aggiornato = False
+                    if prodotto.categoria != categoria:
+                        prodotto.categoria = categoria
+                        aggiornato = True
+                    if prodotto.classe_spedizione != classe_spedizione:
+                        prodotto.classe_spedizione = classe_spedizione
+                        aggiornato = True
+                    if aggiornato:
+                        prodotto.save()
+                        aggiornati += 1
+                        self.stdout.write(f"🔁 Aggiornato: {nome}")
+                    else:
+                        self.stdout.write(f"⚠️ Già esistente (nessuna modifica): {nome}")
+                    esistenti += 1
 
                 # Aggiorna l'immagine solo se il prodotto è stato creato o se l'immagine deve essere aggiornata
                 image_urls = row.get('images', '').split(',')
                 if image_urls and image_urls[0].strip():
                     self.salva_immagine_da_url(prodotto, image_urls[0].strip(), overwrite=True)
 
-                if creato:
-                    creati += 1
-                    self.stdout.write(f"✅ Creato: {nome}")
-                else:
-                    esistenti += 1
-                    self.stdout.write(f"⚠️ Già esistente: {nome}")
-
         self.stdout.write(self.style.SUCCESS(
-            f"\n✅ Importazione completata: {creati} creati, {esistenti} già presenti, {errori} errori."
+            f"\n✅ Importazione completata: {creati} creati, {aggiornati} aggiornati, {esistenti} già presenti, {errori} errori."
         ))
 
     def salva_immagine_da_url(self, prodotto, url, overwrite=False):

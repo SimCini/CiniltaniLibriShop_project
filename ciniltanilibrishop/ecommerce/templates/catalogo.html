@@ -2,6 +2,22 @@
 {% load static %}
 {% block content %}
     <section class="py-5">
+        <div style="display: flex; gap: 10px; padding: 10px; justify-content: center; flex-wrap: wrap;">
+          {% for categoria_codice, categoria_nome in categorie %}
+            <a href="?categoria={{ categoria_codice }}">
+                <button style="
+                    padding: 8px 16px;
+                    border: none;
+                    border-radius: 5px;
+                    background-color: {% if categoria_attiva == categoria_codice %}#555{% else %}#ddd{% endif %};
+                    color: {% if categoria_attiva == categoria_codice %}white{% else %}black{% endif %};
+                    cursor: pointer;
+                ">
+                    {{ categoria_nome }}
+                </button>
+            </a>
+          {% endfor %}
+        </div>
         <div class="container px-4 px-lg-5 mt-5">
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
                 {% for prodotto in page_obj %}
@@ -63,4 +79,4 @@
               </div>
         </div>
     </section>
-{% endblock content%}
+{% endblock %}

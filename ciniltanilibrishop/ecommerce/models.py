@@ -11,7 +11,7 @@ class Prodotto(models.Model):
         ('cereria', 'Cereria'),
         ('immaginette', 'Immaginette'),
         ('santa_messa', 'Ostie e vino per S. Messa'),
-        ('incenso', 'Incenso e carboncini'),
+        ('incenso-carboncini', 'Incenso e carboncini'),
         ('oratorio', 'Oratorio estivo'),
     ]
 

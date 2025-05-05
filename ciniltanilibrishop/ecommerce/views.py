@@ -18,13 +18,34 @@ def chi_sono(request):
 
 def catalogo(request):
     # Filtra i prodotti disponibili (o puoi aggiungere altri filtri)
+    '''
     prodotti = Prodotto.objects.filter(disponibile=True)
     prodotti_per_pagina = 20
     paginator = Paginator(prodotti, prodotti_per_pagina)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, 'catalogo.html', {'page_obj': page_obj})
-    
+    '''
+    categoria = request.GET.get('categoria')
+
+    prodotti = Prodotto.objects.filter(disponibile=True)
+    if categoria and categoria != 'tutti':
+        prodotti = prodotti.filter(categoria=categoria)
+
+    prodotti_per_pagina = 20
+    paginator = Paginator(prodotti, prodotti_per_pagina)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    categorie = [('tutti', 'Tutti')] + list(Prodotto.CATEGORIE)
+
+    context = {
+        'page_obj': page_obj,
+        'categoria_attiva': categoria,
+        'categorie': categorie,
+    }
+    return render(request, 'catalogo.html', context)
+
 def dettaglio_prodotto(request, pk):
     prodotto = get_object_or_404(Prodotto, id=pk)  # Ottieni il prodotto per ID
     return render(request, 'dettaglio_prodotto.html', {'prodotto': prodotto})
