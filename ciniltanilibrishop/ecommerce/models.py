@@ -12,7 +12,7 @@ class Prodotto(models.Model):
         ('immaginette', 'Immaginette'),
         ('santa_messa', 'Ostie e vino per S. Messa'),
         ('incenso-carboncini', 'Incenso e carboncini'),
-        ('oratorio', 'Oratorio estivo'),
+        #('oratorio', 'Oratorio estivo'),
     ]
 
     CLASSI_SPEDIZIONE = [

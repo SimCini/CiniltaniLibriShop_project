@@ -13,4 +13,5 @@ urlpatterns = [
     path('catalogo/<int:pk>/', views.dettaglio_prodotto, name='dettaglio_prodotto'),
     path('contatti/',views.contatti, name='contatti'),
     path('risultati/',views.risultati_ricerca, name='risultati_ricerca'),
+    path('profilo/',views.profilo, name='profilo_utente'),
 ]

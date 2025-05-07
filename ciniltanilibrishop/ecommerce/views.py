@@ -1,6 +1,5 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
-from django.views.generic import ListView
 from django.db.models import Q
 from .models import Prodotto
 
@@ -53,6 +52,9 @@ def dettaglio_prodotto(request, pk):
 def contatti(request):
     return render(request, 'contatti.html')
 
+def profilo(request):
+    return render(request, 'profilo_utente.html')
+
 def risultati_ricerca(request):
     query = request.GET.get('q')
     #print("🔍 Query cercata:", query)
@@ -60,7 +62,6 @@ def risultati_ricerca(request):
         Q(nome__icontains=query) | Q(categoria__icontains=query)
     )
     #print("📦 Prodotti trovati:", prodotti.count())
-    from django.core.paginator import Paginator
     paginator = Paginator(prodotti, 20)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
