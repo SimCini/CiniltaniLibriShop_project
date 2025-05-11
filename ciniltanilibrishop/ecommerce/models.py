@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 #installare cloudinary su django (pip install cloudinary django-cloudinary-storage)
 
@@ -72,9 +73,45 @@ class Utente(AbstractUser):
     cognome = models.CharField(max_length=50, blank=True)
     ruolo = models.CharField(max_length=20, choices=RUOLI, default='cliente')
 
+    data_registrazione = models.DateTimeField(null=True, blank=True)
+    telefono_spedizione = models.CharField(max_length=20, blank=True)
+    indirizzo_spedizione = models.CharField(max_length=255, blank=True)
+    indirizzo_spedizione_2 = models.CharField(max_length=255, blank=True)
+    citta_spedizione = models.CharField(max_length=100, blank=True)
+    cap_spedizione = models.CharField(max_length=20, blank=True)
+    stato_spedizione = models.CharField(max_length=100, blank=True)
+    paese_spedizione = models.CharField(max_length=2, blank=True)  # es. 'IT'
+    spesa_totale = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
     def __str__(self):
         return self.username
 
     class Meta:
         verbose_name = "Utente"
         verbose_name_plural = "Utenti"
+
+class Ordine(models.Model):
+    STATUS_CHOICES = [
+        ('on-hold', 'In attesa'),
+        ('completed', 'Completato'),
+        ('cancelled', 'Cancellato'),
+        ('refunded', 'Rimborsato'),
+        # Aggiungi altri stati rilevanti se necessario
+    ]
+
+    numero_ordine = models.PositiveIntegerField(unique=True)
+    utente = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='ordini')
+    data_ordine = models.DateTimeField()
+    data_pagamento = models.DateTimeField(null=True, blank=True)
+    stato = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    totale_spedizione = models.DecimalField(max_digits=10, decimal_places=2)
+    totale_tasse = models.DecimalField(max_digits=10, decimal_places=2)
+    totale = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        verbose_name = "Ordine"
+        verbose_name_plural = "Ordini"
+        ordering = ['-data_ordine']
+
+    def __str__(self):
+        return f"Ordine #{self.numero_ordine} - {self.utente.username}"
