@@ -1,0 +1,317 @@
+{% extends "index.html" %}
+{% load static %}
+{% block content %}
+    <section class="py-5">
+        <div class="container">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'ecommerce:home' %}" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Carrello</li>
+                </ol>
+            </nav>
+
+            <h1 class="mb-4 section-title">Il tuo carrello</h1>
+
+            {% if carrello_items %}
+                <div class="row">
+                    <!-- Tabella Prodotti -->
+                    <div class="col-lg-8">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="border-0 bg-light">Prodotto</th>
+                                                <th scope="col" class="border-0 bg-light text-center">Prezzo</th>
+                                                <th scope="col" class="border-0 bg-light text-center">Quantità</th>
+                                                <th scope="col" class="border-0 bg-light text-center">Totale</th>
+                                                <th scope="col" class="border-0 bg-light text-center">Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in carrello_items %}
+                                            <tr>
+                                                <td class="align-middle">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="me-3" style="width: a80px; height: 80px;">
+                                                            {% if item.prodotto.foto %}
+                                                                <img src="{{ item.prodotto.foto.url }}" class="img-fluid rounded" alt="{{ item.prodotto.nome }}">
+                                                            {% else %}
+                                                                <img src="{% static 'assets/image-not-found.jpg' %}" class="img-fluid rounded" alt="{{ item.prodotto.nome }}">
+                                                            {% endif %}
+                                                        </div>
+                                                        <div>
+                                                            <h6 class="mb-0"><a href="{% url 'ecommerce:dettaglio_prodotto' item.prodotto.id %}" class="text-decoration-none text-dark">{{ item.prodotto.nome }}</a></h6>
+                                                            {% if item.prodotto.categoria %}
+                                                                <small class="text-muted">{{ item.prodotto.categoria.nome }}</small>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                    {% if item.prodotto.prezzo_scontato and item.prodotto.prezzo_scontato < item.prodotto.prezzo %}
+                                                        <span class="text-muted"><del>€{{ item.prodotto.prezzo }}</del></span><br>
+                                                        <span>€{{ item.prodotto.prezzo_scontato }}</span>
+                                                    {% else %}
+                                                        <span>€{{ item.prodotto.prezzo }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                    <div class="quantity-control d-flex justify-content-center align-items-center">
+                                                        <form method="post" action="{% url 'ecommerce:aggiorna_carrello' item.id %}" class="d-flex">
+                                                            {% csrf_token %}
+                                                            <button type="submit" name="action" value="decrement" class="btn btn-sm btn-outline-secondary">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                            <input type="number" name="quantita" value="{{ item.quantita }}" min="1" max="99" class="form-control form-control-sm text-center mx-2" style="width: 60px;">
+                                                            <button type="submit" name="action" value="increment" class="btn btn-sm btn-outline-secondary">
+                                                                <i class="fas fa-plus"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                    <strong>€{{ item.totale }}</strong>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                    <form method="post" action="{% url 'ecommerce:rimuovi_dal_carrello' item.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Opzioni Carrello -->
+                        <div class="d-flex justify-content-between mb-5">
+                            <a href="{% url 'ecommerce:catalogo' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Continua lo shopping
+                            </a>
+                            <form method="post" action="{% url 'ecommerce:svuota_carrello' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger">
+                                    <i class="fas fa-trash me-2"></i>Svuota carrello
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Riepilogo Ordine -->
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Riepilogo ordine</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span>Subtotale</span>
+                                    <strong>€{{ subtotale }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span>Spedizione</span>
+                                    {% if spedizione_gratuita %}
+                                        <span class="text-success">Gratuita</span>
+                                    {% else %}
+                                        <span>€{{ costo_spedizione }}</span>
+                                    {% endif %}
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between mb-4">
+                                    <span>Totale (IVA inclusa)</span>
+                                    <strong class="text-primary">€{{ totale }}</strong>
+                                </div>
+                                
+                                <!-- Procedi all'ordine -->
+                                <a href="{% url 'ecommerce:checkout' %}" class="btn btn-primary w-100">
+                                    Procedi all'ordine
+                                </a>
+                                
+                                <!-- Metodi di pagamento -->
+                                <div class="mt-3 text-center">
+                                    <small class="text-muted">Metodi di pagamento accettati</small>
+                                    <div class="mt-2">
+                                        <i class="fab fa-cc-visa fa-2x mx-1"></i>
+                                        <i class="fab fa-cc-mastercard fa-2x mx-1"></i>
+                                        <i class="fab fa-cc-paypal fa-2x mx-1"></i>
+                                        <i class="fab fa-cc-amex fa-2x mx-1"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Informazioni aggiuntive -->
+                        <div class="card mt-4 shadow-sm">
+                            <div class="card-body">
+                                <h6><i class="fas fa-truck me-2"></i>Spedizione</h6>
+                                <p class="small text-muted mb-3">Spedizione gratuita per ordini superiori a €75. Consegna entro 3-5 giorni lavorativi.</p>
+                                
+                                <h6><i class="fas fa-exchange-alt me-2"></i>Resi e rimborsi</h6>
+                                <p class="small text-muted mb-3">Hai 14 giorni per restituire i prodotti non utilizzati.</p>
+                                
+                                <h6><i class="fas fa-shield-alt me-2"></i>Pagamenti sicuri</h6>
+                                <p class="small text-muted mb-0">Tutte le transazioni sono criptate e sicure.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Prodotti correlati -->
+                <div class="mt-5">
+                    <h4 class="mb-4">Potrebbe interessarti anche</h4>
+                    <div class="row row-cols-2 row-cols-md-4 g-4">
+                        {% for prodotto in prodotti_correlati %}
+                            <div class="col">
+                                <div class="card h-100">
+                                    <div class="prodotto-img">
+                                        {% if prodotto.foto %}
+                                            <img src="{{ prodotto.foto.url }}" class="card-img-top" alt="{{ prodotto.nome }}">
+                                        {% else %}
+                                            <img src="{% static 'assets/image-not-found.jpg' %}" class="card-img-top" alt="{{ prodotto.nome }}">
+                                        {% endif %}
+                                        {% if prodotto.prezzo_scontato and prodotto.prezzo_scontato < prodotto.prezzo %}
+                                            <div class="badge bg-success text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sconto</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ prodotto.nome }}</h5>
+                                        <div class="text-center">
+                                            {% if prodotto.prezzo_scontato and prodotto.prezzo_scontato < prodotto.prezzo %}
+                                                <p class="text-muted mb-0"><del>€{{ prodotto.prezzo }}</del></p>
+                                                <p class="fw-bold">€{{ prodotto.prezzo_scontato }}</p>
+                                            {% else %}
+                                                <p class="fw-bold">€{{ prodotto.prezzo }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-transparent border-top-0">
+                                        <div class="d-grid">
+                                            <form method="post" action="{% url 'ecommerce:aggiungi_al_carrello' prodotto.id %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="quantita" value="1">
+                                                <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                                                    <i class="fas fa-shopping-cart me-1"></i> Aggiungi
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <!-- Carrello vuoto -->
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-shopping-cart fa-5x text-muted"></i>
+                    </div>
+                    <h3 class="mb-3">Il tuo carrello è vuoto</h3>
+                    <p class="text-muted mb-4">Non hai ancora aggiunto prodotti al carrello.</p>
+                    <a href="{% url 'ecommerce:catalogo' %}" class="btn btn-primary">
+                        <i class="fas fa-shopping-bag me-2"></i>Continua lo shopping
+                    </a>
+                </div>
+                
+            {% endif %}
+        </div>
+    </section>
+
+    <style>
+        .section-title {
+            position: relative;
+            display: inline-block;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #602F75;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 2px;
+            background-color: #D4AF37;
+            bottom: -10px;
+            left: 0;
+        }
+        
+        .card {
+            transition: transform 0.3s;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .btn-primary {
+            background-color: #602F75;
+            border-color: #602F75;
+        }
+        
+        .btn-primary:hover {
+            background-color: #8E44AD;
+            border-color: #8E44AD;
+        }
+        
+        .bg-primary {
+            background-color: #602F75 !important;
+        }
+        
+        .text-primary {
+            color: #602F75 !important;
+        }
+        
+        .breadcrumb-item a {
+            color: #8E44AD;
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item.active {
+            color: #602F75;
+        }
+        
+        .prodotto-img {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .prodotto-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .quantity-control .form-control:focus {
+            box-shadow: none;
+            border-color: #602F75;
+        }
+        
+        .btn-outline-primary {
+            color: #602F75;
+            border-color: #602F75;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: #602F75;
+            color: white;
+        }
+        
+        /* Correzioni per input numerico */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            opacity: 1;
+        }
+    </style>
+{% endblock %}

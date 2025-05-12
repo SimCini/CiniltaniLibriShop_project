@@ -27,7 +27,7 @@
                 </div>
             </div>
                 <div class="menu">
-                    <a href="{% url 'ecommerce:home'%}">HOME</a>
+                    <a href="{% url 'ecommerce:homepage'%}">HOME</a>
                     <a href="{% url 'ecommerce:catalogo'%}">CATALOGO</a>
                     <a href="{% url 'ecommerce:chi_sono'%}">CHI SONO</a>
                     <a href="{% url 'ecommerce:contatti'%}">CONTATTI</a>
@@ -38,11 +38,11 @@
                     <input class="form-control mr-sm-2" type="search" name="q" placeholder="Cerca..." aria-label="Cerca" id="cerca">
                     <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" id ="btn-cerca">Cerca</button>
                 </form>
-                <i class="fas fa-shopping-cart" style="margin-top: 10px; "></i>
+                <a href="{% url 'ecommerce:visualizza_carrello' %}" style="color:black;"><i class="fas fa-shopping-cart" style="margin-top: 10px; "></i></a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'ecommerce:profilo_utente' %}">
+                    <a href="{% url 'ecommerce:profilo_utente' %}" style="color:black;">
                 {% else %}
-                    <a href="{% url 'ecommerce:login' %}">
+                    <a href="{% url 'ecommerce:login' %}" style="color:black;">
                 {% endif %}
                     <i class="fas fa-user" style="margin-top: 10px;"></i>
                 </a>
@@ -54,7 +54,7 @@
                 <input class="form-control mr-sm-2" type="search" name="q" placeholder="Cerca..." aria-label="Cerca" id="cerca">
                 <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" id ="btn-cerca">Cerca</button>
             </form>
-            <a href="{% url 'ecommerce:home'%}">HOME</a>
+            <a href="{% url 'ecommerce:homepage'%}">HOME</a>
             <a href="{% url 'ecommerce:catalogo'%}">CATALOGO</a>
             <a href="{% url 'ecommerce:chi_sono'%}">CHI SONO</a>
             <a href="{% url 'ecommerce:contatti'%}">CONTATTI</a>
