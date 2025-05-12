@@ -134,3 +134,5 @@ STATICFILES_DIRS = [
 AUTH_USER_MODEL = 'ecommerce.Utente'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = 'ecommerce:login'

@@ -4,7 +4,7 @@
 <main>
     <h1 class="page-title">Il Mio Account</h1>
    
-    <div class="container_profilo">
+    <!--<div class="container_profilo">
         <div class="barra">
             <div class="info-user">
                 <img src="https://thumbs.dreamstime.com/b/icona-utente-social-media-vettoriale-immagine-profilo-avatar-predefinita-potrait-182347582.jpg" alt="Avatar" class="avatar">
@@ -255,8 +255,33 @@
                 </tbody>  
             </table>
         </div>
-    </div>  
-    
+    </div>-->  
+    <div class="container_profilo">
+        <div class="barra">
+            <div class="info-user">
+                <img src="https://thumbs.dreamstime.com/b/icona-utente-social-media-vettoriale-immagine-profilo-avatar-predefinita-potrait-182347582.jpg" alt="Avatar" class="avatar">
+                <div>
+                    <h2 class="user-name">{{ utente.nome }} {{ utente.cognome }}</h2>
+                    <p class="user-email">{{ utente.email }}</p>
+                </div>
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="#" class="active"><i>📋</i> I Miei Ordini</a></li>
+                <li><a href="#"><i>🏠</i> Indirizzi</a></li>
+                <li><a href="#"><i>👤</i> Dati Personali</a></li>
+                <li><a href="#"><i>📤</i> Logout</a></li>
+            </ul>
+        </div>
+        <div class="content-area">
+            <div class="content-header">
+                <h2 class="content-title">I Miei Ordini</h2>
+                </div>
+
+            <table class="orders-table">
+                </table>
+        </div>
+    </div>
 </main>
 <script>
    // Script per la gestione degli ordini
