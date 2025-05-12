@@ -8,7 +8,6 @@ app_name = 'ecommerce'
 urlpatterns = [
     path('login',views.login, name='login'),
     path('registrati',views.registrati, name='registrati'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     path('',views.homepage, name='homepage'),
     path('chi_sono',views.chi_sono, name='chi_sono'),
     path('catalogo/', views.catalogo, name='catalogo'),

@@ -2,39 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib import messages
-from django.contrib.auth import login as auth_login
-from django.contrib.auth.decorators import login_required
 from .models import Prodotto
-from .forms import LoginForm, RegistrazioneForm
-
 
 def login(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        form.set_request(request) # Imposta l'oggetto request per il form
-        if form.is_valid():
-            user = form.cleaned_data['user']
-            auth_login(request, user)
-            messages.success(request, f'Benvenuto, {user.nome}!') # Usa il nome dell'utente
-            return redirect('ecommerce:homepage')
-        else:
-            return render(request, 'login.html', {'form': form})
-    else:
-        form = LoginForm()
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'login.html')
 
 def registrati(request):
-    if request.method == 'POST':
-        form = RegistrazioneForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            messages.success(request, 'Registrazione avvenuta con successo! Puoi effettuare il login.')
-            return redirect('ecommerce:login')
-        else:
-            return render(request, 'registrati.html', {'form': form})
-    else:
-        form = RegistrazioneForm()
-    return render(request, 'registrati.html', {'form': form})
+    return render(request, 'registrati.html')
 
 def homepage(request):
     return render(request, 'homepage.html')
@@ -97,7 +71,6 @@ def dettaglio_prodotto(request, pk):
 def contatti(request):
     return render(request, 'contatti.html')
 
-@login_required
 def profilo(request):
     utente = request.user # L'oggetto Utente dell'utente loggato
     context = {

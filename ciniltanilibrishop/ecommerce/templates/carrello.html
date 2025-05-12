@@ -3,15 +3,6 @@
 {% block content %}
     <section class="py-5">
         <div class="container">
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'ecommerce:home' %}" class="text-decoration-none">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Carrello</li>
-                </ol>
-            </nav>
-
-            <h1 class="mb-4 section-title">Il tuo carrello</h1>
 
             {% if carrello_items %}
                 <div class="row">
@@ -226,23 +217,6 @@
     </section>
 
     <style>
-        .section-title {
-            position: relative;
-            display: inline-block;
-            font-weight: bold;
-            margin-bottom: 30px;
-            color: #602F75;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            width: 50%;
-            height: 2px;
-            background-color: #D4AF37;
-            bottom: -10px;
-            left: 0;
-        }
         
         .card {
             transition: transform 0.3s;
@@ -255,30 +229,30 @@
         }
         
         .btn-primary {
-            background-color: #602F75;
-            border-color: #602F75;
+            background-color: #2061A2;
+            border-color: #2061A2;
         }
         
         .btn-primary:hover {
-            background-color: #8E44AD;
-            border-color: #8E44AD;
+            background-color: #3E3380;
+            border-color: #3E3380;
         }
         
         .bg-primary {
-            background-color: #602F75 !important;
+            background-color: #2061A2 !important;
         }
         
         .text-primary {
-            color: #602F75 !important;
+            color: #2061A2 !important;
         }
         
         .breadcrumb-item a {
-            color: #8E44AD;
+            color: #3E3380;
             text-decoration: none;
         }
         
         .breadcrumb-item.active {
-            color: #602F75;
+            color: #2061A2;
         }
         
         .prodotto-img {
@@ -295,16 +269,16 @@
         
         .quantity-control .form-control:focus {
             box-shadow: none;
-            border-color: #602F75;
+            border-color: #2061A2;
         }
         
         .btn-outline-primary {
-            color: #602F75;
-            border-color: #602F75;
+            color: #2061A2;
+            border-color: #2061A2;
         }
         
         .btn-outline-primary:hover {
-            background-color: #602F75;
+            background-color: #2061A2;
             color: white;
         }
         
