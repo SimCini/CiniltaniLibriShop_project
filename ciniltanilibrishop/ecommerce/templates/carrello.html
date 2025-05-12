@@ -4,7 +4,7 @@
     <section class="py-5">
         <div class="container">
 
-            {% if carrello_items %}
+            {% if carrello_prodotti %}
                 <div class="row">
                     <!-- Tabella Prodotti -->
                     <div class="col-lg-8">
@@ -22,11 +22,11 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for item in carrello_items %}
+                                            {% for item in carrello_prodotti %}
                                             <tr>
                                                 <td class="align-middle">
                                                     <div class="d-flex align-items-center">
-                                                        <div class="me-3" style="width: a80px; height: 80px;">
+                                                        <div class="me-3" style="width: 80px; height: 80px;">
                                                             {% if item.prodotto.foto %}
                                                                 <img src="{{ item.prodotto.foto.url }}" class="img-fluid rounded" alt="{{ item.prodotto.nome }}">
                                                             {% else %}
@@ -50,21 +50,21 @@
                                                     {% endif %}
                                                 </td>
                                                 <td class="align-middle text-center">
-                                                    <div class="quantity-control d-flex justify-content-center align-items-center">
-                                                        <form method="post" action="{% url 'ecommerce:aggiorna_carrello' item.id %}" class="d-flex">
-                                                            {% csrf_token %}
-                                                            <button type="submit" name="action" value="decrement" class="btn btn-sm btn-outline-secondary">
-                                                                <i class="fas fa-minus"></i>
-                                                            </button>
-                                                            <input type="number" name="quantita" value="{{ item.quantita }}" min="1" max="99" class="form-control form-control-sm text-center mx-2" style="width: 60px;">
-                                                            <button type="submit" name="action" value="increment" class="btn btn-sm btn-outline-secondary">
-                                                                <i class="fas fa-plus"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
+                                                <div class="quantity-control d-flex justify-content-center align-items-center">
+                                                    <form method="post" action="{% url 'ecommerce:aggiorna_carrello' item.id %}" class="d-flex">
+                                                        {% csrf_token %}
+                                                        <button type="button" onclick="decreaseQuantity({{ item.id }})" class="btn btn-sm btn-outline-secondary">
+                                                            <i class="fas fa-minus"></i>
+                                                        </button>
+                                                        <input type="number" id="quantity-{{ item.id }}" name="quantita" value="{{ item.quantita }}" min="1" max="99" class="form-control form-control-sm text-center mx-2" style="width: 60px;" oninput="updateQuantity({{ item.id }})">
+                                                        <button type="button" onclick="increaseQuantity({{ item.id }})" class="btn btn-sm btn-outline-secondary">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                                 </td>
                                                 <td class="align-middle text-center">
-                                                    <strong>€{{ item.totale }}</strong>
+                                                    <span id="total-{{ item.id }}">€{{ item.totale }}</span>
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     <form method="post" action="{% url 'ecommerce:rimuovi_dal_carrello' item.id %}">
@@ -87,7 +87,7 @@
                             <a href="{% url 'ecommerce:catalogo' %}" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-2"></i>Continua lo shopping
                             </a>
-                            <form method="post" action="{% url 'ecommerce:svuota_carrello' %}">
+                            <form method="post" action="#">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-outline-danger">
                                     <i class="fas fa-trash me-2"></i>Svuota carrello
@@ -122,83 +122,14 @@
                                 </div>
                                 
                                 <!-- Procedi all'ordine -->
-                                <a href="{% url 'ecommerce:checkout' %}" class="btn btn-primary w-100">
+                                <a href="#" class="btn btn-primary w-100">
                                     Procedi all'ordine
                                 </a>
-                                
-                                <!-- Metodi di pagamento -->
-                                <div class="mt-3 text-center">
-                                    <small class="text-muted">Metodi di pagamento accettati</small>
-                                    <div class="mt-2">
-                                        <i class="fab fa-cc-visa fa-2x mx-1"></i>
-                                        <i class="fab fa-cc-mastercard fa-2x mx-1"></i>
-                                        <i class="fab fa-cc-paypal fa-2x mx-1"></i>
-                                        <i class="fab fa-cc-amex fa-2x mx-1"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Informazioni aggiuntive -->
-                        <div class="card mt-4 shadow-sm">
-                            <div class="card-body">
-                                <h6><i class="fas fa-truck me-2"></i>Spedizione</h6>
-                                <p class="small text-muted mb-3">Spedizione gratuita per ordini superiori a €75. Consegna entro 3-5 giorni lavorativi.</p>
-                                
-                                <h6><i class="fas fa-exchange-alt me-2"></i>Resi e rimborsi</h6>
-                                <p class="small text-muted mb-3">Hai 14 giorni per restituire i prodotti non utilizzati.</p>
-                                
-                                <h6><i class="fas fa-shield-alt me-2"></i>Pagamenti sicuri</h6>
-                                <p class="small text-muted mb-0">Tutte le transazioni sono criptate e sicure.</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Prodotti correlati -->
-                <div class="mt-5">
-                    <h4 class="mb-4">Potrebbe interessarti anche</h4>
-                    <div class="row row-cols-2 row-cols-md-4 g-4">
-                        {% for prodotto in prodotti_correlati %}
-                            <div class="col">
-                                <div class="card h-100">
-                                    <div class="prodotto-img">
-                                        {% if prodotto.foto %}
-                                            <img src="{{ prodotto.foto.url }}" class="card-img-top" alt="{{ prodotto.nome }}">
-                                        {% else %}
-                                            <img src="{% static 'assets/image-not-found.jpg' %}" class="card-img-top" alt="{{ prodotto.nome }}">
-                                        {% endif %}
-                                        {% if prodotto.prezzo_scontato and prodotto.prezzo_scontato < prodotto.prezzo %}
-                                            <div class="badge bg-success text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sconto</div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ prodotto.nome }}</h5>
-                                        <div class="text-center">
-                                            {% if prodotto.prezzo_scontato and prodotto.prezzo_scontato < prodotto.prezzo %}
-                                                <p class="text-muted mb-0"><del>€{{ prodotto.prezzo }}</del></p>
-                                                <p class="fw-bold">€{{ prodotto.prezzo_scontato }}</p>
-                                            {% else %}
-                                                <p class="fw-bold">€{{ prodotto.prezzo }}</p>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="card-footer bg-transparent border-top-0">
-                                        <div class="d-grid">
-                                            <form method="post" action="{% url 'ecommerce:aggiungi_al_carrello' prodotto.id %}">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="quantita" value="1">
-                                                <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                                                    <i class="fas fa-shopping-cart me-1"></i> Aggiungi
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
             {% else %}
                 <!-- Carrello vuoto -->
                 <div class="text-center py-5">
@@ -211,7 +142,6 @@
                         <i class="fas fa-shopping-bag me-2"></i>Continua lo shopping
                     </a>
                 </div>
-                
             {% endif %}
         </div>
     </section>
@@ -288,4 +218,91 @@
             opacity: 1;
         }
     </style>
+
+    <script>
+    // Array con i prezzi dei prodotti (questo può essere dinamico)
+    const productPrices = {
+        {% for item in carrello_items %}
+        {{ item.id }}: {{ item.prodotto.prezzo }},
+        {% endfor %}
+    };
+
+    // Funzione per aggiornare le quantità
+    function updateQuantity(id) {
+        const quantityInput = document.getElementById(`quantity-${id}`);
+        let quantity = parseInt(quantityInput.value);
+
+        // Validazione: quantità minima 1
+        if (isNaN(quantity) || quantity < 1) {
+            quantity = 1;
+            quantityInput.value = quantity;
+        }
+
+        // Aggiorna il totale della riga
+        const price = productPrices[id];
+        const total = price * quantity;
+        document.getElementById(`total-${id}`).textContent = `€${total.toFixed(2)}`;
+
+        // Aggiorna il riepilogo del carrello
+        updateCartSummary();
+    }
+
+    // Funzione per aumentare la quantità
+    function increaseQuantity(id) {
+        const quantityInput = document.getElementById(`quantity-${id}`);
+        let quantity = parseInt(quantityInput.value);
+        quantity++;
+        quantityInput.value = quantity;
+        updateQuantity(id);
+    }
+
+    // Funzione per diminuire la quantità
+    function decreaseQuantity(id) {
+        const quantityInput = document.getElementById(`quantity-${id}`);
+        let quantity = parseInt(quantityInput.value);
+        if (quantity > 1) {
+            quantity--;
+            quantityInput.value = quantity;
+            updateQuantity(id);
+        }
+    }
+
+    // Funzione per rimuovere un articolo
+    function removeItem(id) {
+        const item = document.querySelector(`.cart-item[data-id="${id}"]`);
+        if (item) {
+            item.remove();
+            updateCartSummary();
+        }
+    }
+
+    // Funzione per aggiornare il riepilogo del carrello
+    function updateCartSummary() {
+        // Calcola il subtotale
+        let subtotal = 0;
+        document.querySelectorAll('.cart-item').forEach(item => {
+            const itemId = item.getAttribute('data-id');
+            const quantity = parseInt(document.getElementById(`quantity-${itemId}`).value);
+            const price = productPrices[itemId];
+            subtotal += price * quantity;
+        });
+
+        // Aggiorna i valori nel riepilogo
+        document.getElementById('cart-subtotal').textContent = `€${subtotal.toFixed(2)}`;
+
+        // Spese di spedizione (gratis sopra i 100€)
+        const shipping = subtotal >= 100 ? 0 : 5.90;
+        document.getElementById('cart-shipping').textContent = shipping === 0 ? 'Gratuita' : `€${shipping.toFixed(2)}`;
+
+        // Calcola il totale
+        const discount = 0; // Simulazione sconto nullo
+        const total = subtotal + shipping - discount;
+        document.getElementById('cart-total').textContent = `€${total.toFixed(2)}`;
+    }
+
+    // Inizializza il riepilogo al caricamento della pagina
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartSummary();
+    });
+    </script>
 {% endblock %}

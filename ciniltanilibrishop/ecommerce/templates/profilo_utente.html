@@ -3,259 +3,6 @@
 {% block content %}
 <main>
     <h1 class="page-title">Il Mio Account</h1>
-   
-    <!--<div class="container_profilo">
-        <div class="barra">
-            <div class="info-user">
-                <img src="https://thumbs.dreamstime.com/b/icona-utente-social-media-vettoriale-immagine-profilo-avatar-predefinita-potrait-182347582.jpg" alt="Avatar" class="avatar">
-                <div>
-                    <h2 class="user-name">Simone</h2>
-                    <p class="user-email">simone.panichi@gmail.com</p>                
-                </div>
-            </div>
-           
-            <ul class="nav-menu">
-                <li><a href="#" class="active"><i>📋</i> I Miei Ordini</a></li>
-                <li><a href="#"><i>🏠</i> Indirizzi</a></li>
-                <li><a href="#"><i>👤</i> Dati Personali</a></li>
-                <li><a href="#"><i>📤</i> Logout</a></li>
-            </ul>
-        </div>
-        <div class="content-area">
-            <div class="content-header">
-                <h2 class="content-title">I Miei Ordini</h2>
-                
-                <div class="filter-container">
-                    <select class="filter-select">
-                        <option value="all">Tutti gli ordini</option>
-                        <option value="completed">Completati</option>
-                        <option value="processing">In elaborazione</option>
-                        <option value="canceled">Annullati</option>
-                    </select>
-                    
-                    <input type="text" placeholder="Cerca ordine..." class="search-input">
-                </div>
-            </div>
-            
-            <table class="orders-table">
-                <thead>
-                    <tr>
-                        <th>Numero Ordine</th>
-                        <th>Data</th>
-                        <th>Prodotti</th>
-                        <th>Totale</th>
-                        <th>Stato</th>
-                        <th>Azioni</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr data-order-id="ORD2025042501">
-                        <td>#ORD2025042501</td>
-                        <td>25/04/2025</td>
-                        <td>3 prodotti</td>
-                        <td>€52,40</td>
-                        <td><span class="status-badge status-completed">Completato</span></td>
-                        <td class="order-actions">
-                            <button class="action-btn view-btn" onclick="toggleOrderDetail('ORD2025042501')">Dettagli</button>
-                            <button class="action-btn view-btn">Fattura</button>
-                        </td>
-                    </tr>
-                    <tr style="display: none;">
-                        <td colspan="6">
-                            <div class="order-detail" id="detail-ORD2025042501">
-                                <div class="detail-header">
-                                    <h3 class="detail-title">Dettagli Ordine #ORD2025042501</h3>
-                                    <button class="close-detail" onclick="toggleOrderDetail('ORD2025042501')">×</button>
-                                </div>
-                                
-                                <div class="order-items">
-                                    <div class="order-item">
-                                        <img src="/api/placeholder/60/60" alt="Bibbia Illustrata" class="item-image">
-                                        <div class="item-details">
-                                            <h4 class="item-name">La Bibbia Illustrata - Edizione Speciale</h4>
-                                            <div class="item-meta">
-                                                <span>Quantità: 1</span>
-                                                <span>ISBN: 978-8821598746</span>
-                                            </div>
-                                        </div>
-                                        <div class="item-price">€39,90</div>
-                                    </div>
-                                    
-                                    <div class="order-item">
-                                        <img src="/api/placeholder/60/60" alt="Segnalibro" class="item-image">
-                                        <div class="item-details">
-                                            <h4 class="item-name">Segnalibro in Argento - Angelo Custode</h4>
-                                            <div class="item-meta">
-                                                <span>Quantità: 1</span>
-                                                <span>Cod: SL-ANG-01</span>
-                                            </div>
-                                        </div>
-                                        <div class="item-price">€12,50</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="order-summary">
-                                    <div class="summary-row">
-                                        <span>Subtotale:</span>
-                                        <span>€52,40</span>
-                                    </div>
-                                    <div class="summary-row">
-                                        <span>Spedizione:</span>
-                                        <span>€0,00 (Gratuita)</span>
-                                    </div>
-                                    <div class="summary-row total">
-                                        <span>Totale:</span>
-                                        <span>€52,40</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="address-info">
-                                    <div class="address-box">
-                                        <h4 class="address-title">Indirizzo di Spedizione</h4>
-                                        <p>Marco Bianchi<br>
-                                           Via Roma 123<br>
-                                           20100, Milano (MI)<br>
-                                           Italia<br>
-                                           Tel: 333 1234567</p>
-                                    </div>
-                                    
-                                    <div class="address-box">
-                                        <h4 class="address-title">Metodo di Pagamento</h4>
-                                        <p>Carta di Credito<br>
-                                           **** **** **** 4589<br>
-                                           Scadenza: 05/2026</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    
-                    <tr data-order-id="ORD2025031802">
-                        <td>#ORD2025031802</td>
-                        <td>18/03/2025</td>
-                        <td>1 prodotto</td>
-                        <td>€24,50</td>
-                        <td><span class="status-badge status-completed">Completato</span></td>
-                        <td class="order-actions">
-                            <button class="action-btn view-btn" onclick="toggleOrderDetail('ORD2025031802')">Dettagli</button>
-                            <button class="action-btn view-btn">Fattura</button>
-                        </td>
-                    </tr>
-                    <tr style="display: none;">
-                        <td colspan="6">
-                            <div class="order-detail" id="detail-ORD2025031802">
-                                <div class="detail-header">
-                                    <h3 class="detail-title">Dettagli Ordine #ORD2025031802</h3>
-                                    <button class="close-detail" onclick="toggleOrderDetail('ORD2025031802')">×</button>
-                                </div>
-                                
-                                <div class="order-items">
-                                    <div class="order-item">
-                                        <img src="/api/placeholder/60/60" alt="Icona Sacra" class="item-image">
-                                        <div class="item-details">
-                                            <h4 class="item-name">Icona Sacra Famiglia</h4>
-                                            <div class="item-meta">
-                                                <span>Quantità: 1</span>
-                                                <span>Cod: IC-SACFAM-02</span>
-                                            </div>
-                                        </div>
-                                        <div class="item-price">€24,50</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="order-summary">
-                                    <div class="summary-row">
-                                        <span>Subtotale:</span>
-                                        <span>€24,50</span>
-                                    </div>
-                                    <div class="summary-row">
-                                        <span>Spedizione:</span>
-                                        <span>€0,00 (Gratuita)</span>
-                                    </div>
-                                    <div class="summary-row total">
-                                        <span>Totale:</span>
-                                        <span>€24,50</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="address-info">
-                                    <div class="address-box">
-                                        <h4 class="address-title">Indirizzo di Spedizione</h4>
-                                        <p>Marco Bianchi<br>
-                                           Via Roma 123<br>
-                                           20100, Milano (MI)<br>
-                                           Italia<br>
-                                           Tel: 333 1234567</p>
-                                    </div>
-                                    
-                                    <div class="address-box">
-                                        <h4 class="address-title">Metodo di Pagamento</h4>
-                                        <p>PayPal<br>
-                                           marco.bianchi@esempio.it</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    
-                    <tr data-order-id="ORD2025021503">
-                        <td>#ORD2025021503</td>
-                        <td>15/02/2025</td>
-                        <td>2 prodotti</td>
-                        <td>€31,40</td>
-                        <td><span class="status-badge status-processing">In elaborazione</span></td>
-                        <td class="order-actions">
-                            <button class="action-btn view-btn" onclick="toggleOrderDetail('ORD2025021503')">Dettagli</button>
-                            <button class="action-btn track-btn">Traccia</button>
-                        </td>
-                    </tr>
-                    <tr style="display: none;">
-                        <td colspan="6">
-                            <div class="order-detail" id="detail-ORD2025021503">
-                                <div class="detail-header">
-                                    <h3 class="detail-title">Dettagli Ordine #ORD2025021503</h3>
-                                    <button class="close-detail" onclick="toggleOrderDetail('ORD2025021503')">×</button>
-                                </div>
-                                
-                                <div class="order-items">
-                                    <div class="order-item">
-                                        <img src="/api/placeholder/60/60" alt="Vangelo" class="item-image">
-                                        <div class="item-details">
-                                            <h4 class="item-name">Vangelo Tascabile</h4>
-                                            <div class="item-meta">
-                                                <span>Quantità: 1</span>
-                                                <span>ISBN: 978-8821598123</span>
-                                            </div>
-                                        </div>
-                                        <div class="item-price">€12,50</div>
-                                    </div>
-                                    
-                                    <div class="order-item">
-                                        <img src="/api/placeholder/60/60" alt="Rosario" class="item-image">
-                                        <div class="item-details">
-                                            <h4 class="item-name">Rosario in Legno d'Ulivo</h4>
-                                            <div class="item-meta">
-                                                <span>Quantità: 1</span>
-                                                <span>Cod: ROS-ULI-01</span>
-                                            </div>
-                                        </div>
-                                        <div class="item-price">€18,90</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="order-summary">
-                                    <div class="summary-row">
-                                        <span>Subtotale:</span>
-                                        <span>€31,40</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>  
-            </table>
-        </div>
-    </div>-->  
     <div class="container_profilo">
         <div class="barra">
             <div class="info-user">
@@ -267,25 +14,25 @@
             </div>
 
             <ul class="nav-menu">
-                <li><a href="#" class="active"><i>📋</i> I Miei Ordini</a></li>
+                <!--<li><a href="#" class="active"><i>📋</i> I Miei Ordini</a></li>
                 <li><a href="#"><i>🏠</i> Indirizzi</a></li>
-                <li><a href="#"><i>👤</i> Dati Personali</a></li>
-                <li><a href="#"><i>📤</i> Logout</a></li>
+                <li><a href="#"><i>👤</i> Dati Personali</a></li>-->
+                <li><a href="#" class="active"><i>📤</i> Logout</a></li>
             </ul>
         </div>
         <div class="content-area">
-            <div class="content-header">
+            <!--<div class="content-header">
                 <h2 class="content-title">I Miei Ordini</h2>
                 </div>
 
             <table class="orders-table">
-                </table>
+                </table>-->
         </div>
     </div>
 </main>
 <script>
    // Script per la gestione degli ordini
-document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
     // Nascondi tutti i dettagli all'inizio
     document.querySelectorAll('.order-detail').forEach(detail => {
         const detailRow = detail.closest('tr');
