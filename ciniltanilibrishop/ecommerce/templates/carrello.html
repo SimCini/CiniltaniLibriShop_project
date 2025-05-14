@@ -43,28 +43,31 @@
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     {% if item.prodotto.prezzo_scontato and item.prodotto.prezzo_scontato < item.prodotto.prezzo %}
-                                                        <span class="text-muted"><del>€{{ item.prodotto.prezzo }}</del></span><br>
-                                                        <span>€{{ item.prodotto.prezzo_scontato }}</span>
+                                                        <span id="unit-price-{{ item.id }}">€{{ item.prodotto.prezzo_scontato|floatformat:2 }}</span>
                                                     {% else %}
-                                                        <span>€{{ item.prodotto.prezzo }}</span>
+                                                        <span id="unit-price-{{ item.id }}">€{{ item.prodotto.prezzo|floatformat:2 }}</span>
                                                     {% endif %}
                                                 </td>
                                                 <td class="align-middle text-center">
-                                                <div class="quantity-control d-flex justify-content-center align-items-center">
-                                                    <form method="post" action="{% url 'ecommerce:aggiorna_carrello' item.id %}" class="d-flex">
-                                                        {% csrf_token %}
-                                                        <button type="button" onclick="decreaseQuantity({{ item.id }})" class="btn btn-sm btn-outline-secondary">
-                                                            <i class="fas fa-minus"></i>
-                                                        </button>
-                                                        <input type="number" id="quantity-{{ item.id }}" name="quantita" value="{{ item.quantita }}" min="1" max="99" class="form-control form-control-sm text-center mx-2" style="width: 60px;" oninput="updateQuantity({{ item.id }})">
-                                                        <button type="button" onclick="increaseQuantity({{ item.id }})" class="btn btn-sm btn-outline-secondary">
-                                                            <i class="fas fa-plus"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
+                                                    <div class="quantity-control d-flex justify-content-center align-items-center">
+                                                        <form method="post" action="{% url 'ecommerce:aggiorna_carrello' item.id %}" class="d-flex">
+                                                            {% csrf_token %}
+                                                            <button type="button" onclick="decreaseQuantity('{{ item.id }}')" class="btn btn-sm btn-outline-secondary">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                            <input type="number" id="quantity-{{ item.id }}" name="quantita" value="{{ item.quantita }}" min="1" max="99" class="form-control form-control-sm text-center mx-2" style="width: 60px;" oninput="updateRowTotal('{{ item.id }}')">
+                                                            <button type="button" onclick="increaseQuantity('{{ item.id }}')" class="btn btn-sm btn-outline-secondary">
+                                                                <i class="fas fa-plus"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
                                                 </td>
                                                 <td class="align-middle text-center">
-                                                    <span id="total-{{ item.id }}">€{{ item.totale }}</span>
+                                                    {% if item.prodotto.prezzo_scontato and item.prodotto.prezzo_scontato < item.prodotto.prezzo %}
+                                                        <span id="total-{{ item.id }}">€{{ (item.prodotto.prezzo_scontato * item.quantita)|floatformat:2 }}</span>
+                                                    {% else %}
+                                                        <span id="total-{{ item.id }}">€{{ (item.prodotto.prezzo * item.quantita)|floatformat:2 }}</span>
+                                                    {% endif %}
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     <form method="post" action="{% url 'ecommerce:rimuovi_dal_carrello' item.id %}">
@@ -228,45 +231,46 @@
     };
 
     // Funzione per aggiornare le quantità
-    function updateQuantity(id) {
-        const quantityInput = document.getElementById(`quantity-${id}`);
-        let quantity = parseInt(quantityInput.value);
+    function updateRowTotal(itemId) {
+    const quantityInput = document.getElementById(`quantity-${itemId}`);
+    const totalSpan = document.getElementById(`total-${itemId}`);
+    const unitPriceSpan = document.getElementById(`unit-price-${itemId}`);
 
-        // Validazione: quantità minima 1
-        if (isNaN(quantity) || quantity < 1) {
-            quantity = 1;
-            quantityInput.value = quantity;
+    if (quantityInput && totalSpan && unitPriceSpan) {
+        const quantity = parseInt(quantityInput.value);
+        const unitPriceText = unitPriceSpan.textContent.replace('€', '');
+        const unitPrice = parseFloat(unitPriceText);
+
+        if (!isNaN(quantity) && !isNaN(unitPrice)) {
+            const newTotal = quantity * unitPrice;
+            totalSpan.textContent = `€${newTotal.toFixed(2)}`;
         }
-
-        // Aggiorna il totale della riga
-        const price = productPrices[id];
-        const total = price * quantity;
-        document.getElementById(`total-${id}`).textContent = `€${total.toFixed(2)}`;
-
-        // Aggiorna il riepilogo del carrello
-        updateCartSummary();
+    }
     }
 
     // Funzione per aumentare la quantità
-    function increaseQuantity(id) {
-        const quantityInput = document.getElementById(`quantity-${id}`);
-        let quantity = parseInt(quantityInput.value);
-        quantity++;
-        quantityInput.value = quantity;
-        updateQuantity(id);
+    function increaseQuantity(itemId) {
+    const quantityInput = document.getElementById(`quantity-${itemId}`);
+    if (quantityInput) {
+        let currentQuantity = parseInt(quantityInput.value);
+        if (currentQuantity < 99) {
+            quantityInput.value = currentQuantity + 1;
+            updateRowTotal(itemId);
+        }
+    }
     }
 
     // Funzione per diminuire la quantità
-    function decreaseQuantity(id) {
-        const quantityInput = document.getElementById(`quantity-${id}`);
-        let quantity = parseInt(quantityInput.value);
-        if (quantity > 1) {
-            quantity--;
-            quantityInput.value = quantity;
-            updateQuantity(id);
+    function decreaseQuantity(itemId) {
+    const quantityInput = document.getElementById(`quantity-${itemId}`);
+    if (quantityInput) {
+        let currentQuantity = parseInt(quantityInput.value);
+        if (currentQuantity > 1) {
+            quantityInput.value = currentQuantity - 1;
+            updateRowTotal(itemId);
         }
     }
-
+    }
     // Funzione per rimuovere un articolo
     function removeItem(id) {
         const item = document.querySelector(`.cart-item[data-id="${id}"]`);

@@ -10,7 +10,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.utils import timezone
 
-
 def homepage(request):
     return render(request, 'homepage.html')
 
@@ -82,18 +81,28 @@ def visualizza_profilo(request):
     }
     return render(request, 'profilo.html', context)
 
-
 def visualizza_carrello(request):
     # Recupera tutti i prodotti nel carrello dell'utente
     carrello_prodotti = Carrello.objects.filter(utente=request.user)
     
-    # Calcola il totale del carrello
-    totale = sum(item.prodotto.prezzo * item.quantita for item in carrello_prodotti)
-
-    return render(request, 'carrello.html', {
+    # Calcola subtotale (senza spese di spedizione)
+    subtotale = 0
+    for item in carrello_prodotti:
+        prezzo_unitario = item.prodotto.prezzo_scontato if (item.prodotto.prezzo_scontato and 
+                item.prodotto.prezzo_scontato < item.prodotto.prezzo) else item.prodotto.prezzo
+        subtotale += prezzo_unitario * item.quantita
+    
+    
+    # Calcola il totale finale
+    totale = subtotale
+    
+    context = {
         'carrello_prodotti': carrello_prodotti,
-        'totale': totale
-    })
+        'subtotale': round(subtotale, 2),
+        'totale': round(totale, 2),
+    }
+    
+    return render(request, 'carrello_prova.html', context)
 
 @login_required
 def aggiungi_al_carrello(request, pk):
@@ -109,38 +118,109 @@ def aggiungi_al_carrello(request, pk):
     
     return redirect('ecommerce:visualizza_carrello')
 
-def aggiorna_carrello(request, pk):
-    carrello = Carrello.objects.get(utente=request.user)  # Esempio di come ottenere il carrello dell'utente
-    prodotto = Prodotto.objects.get(id=pk)  # Ottieni il prodotto tramite l'ID
-    
-    # Supponiamo che tu stia ricevendo la nuova quantità tramite POST
-    nuova_quantita = int(request.POST.get('quantita'))
-    
-    # Trova l'articolo nel carrello
-    carrello_item = carrello.items.get(prodotto=prodotto)
-    
-    # Aggiorna la quantità
-    carrello_item.quantita = nuova_quantita
-    carrello_item.save()
-
-    # Redirigi indietro al carrello o dove vuoi
-    return redirect('ecommerce:visualizza_carrello') 
-
-def rimuovi_dal_carrello(request, pk):
-    # Ottieni il carrello dell'utente
-    try:
-        # Trova l'articolo da rimuovere (questo dovrebbe essere un solo oggetto)
-        carrello_item = Carrello.objects.get(utente=request.user, prodotto__id=pk)
+@login_required
+def aggiorna_carrello(request, item_id):
+    if request.method == 'POST':
+        item = get_object_or_404(Carrello, id=item_id, utente=request.user)
         
-        # Rimuovi l'articolo dal carrello
-        carrello_item.delete()
+        try:
+            nuova_quantita = int(request.POST.get('quantita', 1))
+            if 1 <= nuova_quantita <= 99:
+                item.quantita = nuova_quantita
+                item.save()
+                
+                # Se la richiesta è AJAX, restituisci i dati aggiornati
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    prezzo_unitario = (item.prodotto.prezzo_scontato 
+                                     if item.prodotto.prezzo_scontato and 
+                                     item.prodotto.prezzo_scontato < item.prodotto.prezzo 
+                                     else item.prodotto.prezzo)
+                    
+                    totale_prodotto = prezzo_unitario * item.quantita
+                    
+                    # Ricalcola il totale del carrello
+                    carrello_prodotti = Carrello.objects.filter(utente=request.user)
+                    subtotale = 0
+                    for cart_item in carrello_prodotti:
+                        prod_prezzo = (cart_item.prodotto.prezzo_scontato 
+                                     if cart_item.prodotto.prezzo_scontato and 
+                                     cart_item.prodotto.prezzo_scontato < cart_item.prodotto.prezzo 
+                                     else cart_item.prodotto.prezzo)
+                        subtotale += prod_prezzo * cart_item.quantita
+                    
+                    spedizione_gratuita = subtotale >= 100
+                    costo_spedizione = 0 if spedizione_gratuita else 5.90
+                    totale = subtotale + costo_spedizione
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'totale_prodotto': round(totale_prodotto, 2),
+                        'subtotale': round(subtotale, 2),
+                        'costo_spedizione': round(costo_spedizione, 2),
+                        'spedizione_gratuita': spedizione_gratuita,
+                        'totale': round(totale, 2),
+                    })
+        except (ValueError, TypeError):
+            pass
+            
+    return redirect('ecommerce:visualizza_carrello')
 
-        # Redirigi al carrello o alla pagina desiderata dopo la rimozione
+@login_required
+def rimuovi_dal_carrello(request, item_id):
+    if request.method == 'POST':
+        item = get_object_or_404(Carrello, id=item_id, utente=request.user)
+        item.delete()
+        
+        # Se la richiesta è AJAX, restituisci un JSON response
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            carrello_prodotti = Carrello.objects.filter(utente=request.user)
+            
+            subtotale = 0
+            for cart_item in carrello_prodotti:
+                prod_prezzo = (cart_item.prodotto.prezzo_scontato 
+                             if cart_item.prodotto.prezzo_scontato and 
+                             cart_item.prodotto.prezzo_scontato < cart_item.prodotto.prezzo 
+                             else cart_item.prodotto.prezzo)
+                subtotale += prod_prezzo * cart_item.quantita
+            
+            spedizione_gratuita = subtotale >= 100
+            costo_spedizione = 0 if spedizione_gratuita else 5.90
+            totale = subtotale + costo_spedizione
+            
+            return JsonResponse({
+                'success': True,
+                'subtotale': round(subtotale, 2),
+                'costo_spedizione': round(costo_spedizione, 2),
+                'spedizione_gratuita': spedizione_gratuita,
+                'totale': round(totale, 2),
+                'carrello_vuoto': not carrello_prodotti.exists(),
+            })
+            
+    return redirect('ecommerce:visualizza_carrello')
+
+@login_required
+def svuota_carrello(request):
+    if request.method == 'POST':
+        Carrello.objects.filter(utente=request.user).delete()
+        
+    return redirect('ecommerce:visualizza_carrello')
+
+@login_required
+def checkout(request):
+    # Questa è una funzione placeholder per il checkout
+    # In un'implementazione reale, qui gestiresti l'indirizzo di spedizione, il pagamento, ecc.
+    carrello_prodotti = Carrello.objects.filter(utente=request.user)
+    
+    if not carrello_prodotti.exists():
+        # Se il carrello è vuoto, reindirizza al carrello
         return redirect('ecommerce:visualizza_carrello')
     
-    except Carrello.DoesNotExist:
-        # Se l'oggetto non esiste, restituisci alla pagina del carrello senza modifiche
-        return redirect('ecommerce:visualizza_carrello')
+    # Per ora, reindirizza semplicemente al carrello con un messaggio
+    # In un'implementazione reale, renderizzeresti una pagina di checkout
+    return render(request, 'carrello.html', {
+        'carrello_prodotti': carrello_prodotti,
+        'messaggio': 'Funzionalità di checkout in fase di sviluppo'
+    })
 
 def risultati_ricerca(request):
     query = request.GET.get('q')
