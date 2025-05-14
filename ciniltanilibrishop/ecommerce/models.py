@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
@@ -66,21 +66,19 @@ class ImmagineProdotto(models.Model):
         return f"Immagine di {self.prodotto.nome}"
     
 class Utente(AbstractUser):
+
     RUOLI = [
         ('amministratore', 'Amministratore'),
         ('cliente', 'Cliente'),
     ]
     
-    username = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(unique=True)
+    ruolo = models.CharField(max_length=20, choices=RUOLI, default='cliente')
     nome = models.CharField(max_length=50, blank=True)
     cognome = models.CharField(max_length=50, blank=True)
-    ruolo = models.CharField(max_length=20, choices=RUOLI, default='cliente')
-
     data_registrazione = models.DateTimeField(null=True, blank=True)
     telefono = models.CharField(max_length=20, blank=True)
     indirizzo = models.CharField(max_length=255, blank=True)
-    citta= models.CharField(max_length=100, blank=True)
+    citta = models.CharField(max_length=100, blank=True)
     cap = models.CharField(max_length=20, blank=True)
     provincia = models.CharField(max_length=100, blank=True)
     paese = models.CharField(max_length=2, blank=True)  # es. 'IT'

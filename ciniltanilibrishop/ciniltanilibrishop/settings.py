@@ -136,3 +136,6 @@ AUTH_USER_MODEL = 'ecommerce.Utente'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'ecommerce:login'
+
+LOGIN_REDIRECT_URL = 'homepage'
+LOGOUT_REDIRECT_URL = 'homepage'

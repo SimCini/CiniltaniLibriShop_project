@@ -29,7 +29,8 @@
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100 p-l-50 p-r-50 p-t-77 p-b-30">
-				<form class="login100-form validate-form">
+				<form class="login100-form validate-form" method="POST" action="{% url 'ecommerce:registrazione' %}">
+					    {% csrf_token %}
 					<span class="login100-form-title p-b-55">
 						Registrati
 					</span>
@@ -44,6 +45,14 @@
 
                     <div class="wrap-input100 validate-input m-b-16" data-validate = "Valid surname is required">
 						<input class="input100" type="text" name="cognome" placeholder="Cognome">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<span class="lnr lnr-envelope"></span>
+						</span>
+					</div>
+
+					<div class="wrap-input100 validate-input m-b-16" data-validate = "Valid username is required">
+						<input class="input100" type="text" name="username" placeholder="Username">
 						<span class="focus-input100"></span>
 						<span class="symbol-input100">
 							<span class="lnr lnr-envelope"></span>
@@ -79,7 +88,21 @@
 							Registrati
 						</button>
 					</div>
+					<div class="text-center w-full p-t-115">
+						<span class="txt1">
+							Hai già un account?
+						</span>
+
+						<a class="txt1 bo1 hov1" href="{% url 'ecommerce:login' %}">
+							Accedi
+						</a>
+					</div>
 				</form>
+				{% if messages %}
+					{% for message in messages %}
+						<p style="color:red;"></p>{{ message }}</p>
+					{% endfor %}
+				{% endif %}
 			</div>
 		</div>
 	</div>

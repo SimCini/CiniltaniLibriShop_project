@@ -6,12 +6,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from .models import Prodotto, Utente, Ordine, Carrello
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
+from django.utils import timezone
 
-def login(request):
-    return render(request, 'login.html')
-
-def registrati(request):
-    return render(request, 'registrati.html')
 
 def homepage(request):
     return render(request, 'homepage.html')
@@ -82,15 +80,8 @@ def visualizza_profilo(request):
         'utente': utente,
         'ordini': ordini,
     }
-    return render(request, 'profilo_utente.html', context)
+    return render(request, 'profilo.html', context)
 
-def logout(request):
-    """
-    Gestisce il logout dell'utente
-    """
-    logout(request)
-    messages.info(request, 'Sei stato disconnesso con successo.')
-    return redirect('homepage')
 
 def visualizza_carrello(request):
     # Recupera tutti i prodotti nel carrello dell'utente
@@ -164,3 +155,59 @@ def risultati_ricerca(request):
 
     return render(request, 'risultati_ricerca.html', {'page_obj': page_obj})
 
+def registrazione_view(request):
+    if request.method == 'POST':
+        nome= request.POST.get('nome')
+        cognome= request.POST.get('cognome')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        conferma_password = request.POST.get('conferma_password')
+
+        # Verifica che le password coincidano
+        if password != conferma_password:
+            messages.error(request, 'Le password non coincidono.')
+        
+        # Verifica che username ed email siano unici
+        elif Utente.objects.filter(username=username).exists():
+            messages.error(request, 'Username già in uso.')
+        elif Utente.objects.filter(email=email).exists():
+            messages.error(request, 'Email già registrata.')
+        
+        else:
+            utente = Utente.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            nome=nome,
+            cognome=cognome,
+            ruolo='cliente',
+            data_registrazione=timezone.now()
+        )
+            messages.success(request, 'Registrazione completata con successo!')
+            return redirect('ecommerce:login')
+
+    return render(request, 'registrati.html')
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        utente = authenticate(request, username=username, password=password)
+        print(f"Tentativo login con: {username} / {password}")
+        print(f"Utente trovato: {utente}")
+
+        if utente is not None:
+            login(request, utente)
+            messages.success(request, 'Accesso effettuato con successo!')
+            return render(request, 'profilo.html', {'utente': utente})
+        else:
+            messages.error(request, 'Username o password non validi.')
+
+    return render(request, 'login.html')
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'Logout effettuato con successo.')
+    return redirect('ecommerce:homepage')

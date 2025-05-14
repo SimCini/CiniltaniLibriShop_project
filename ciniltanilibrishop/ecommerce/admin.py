@@ -1,5 +1,6 @@
 from django.contrib import admin
 from ecommerce.models import Prodotto, Utente, Ordine, ElementoOrdine
+from django.contrib.auth.admin import UserAdmin
 
 class ProdottoAdmin(admin.ModelAdmin):
     # Aggiungi i campi sui quali eseguire la ricerca
@@ -13,12 +14,15 @@ class ProdottoAdmin(admin.ModelAdmin):
 # Registrare il modello Prodotto con la configurazione admin personalizzata
 admin.site.register(Prodotto, ProdottoAdmin)
 
-admin.site.register(Utente)
-
 class ElementoOrdineInline(admin.TabularInline):
     model = ElementoOrdine
     extra = 0  # Nessuna riga vuota aggiuntiva per default
     readonly_fields = ['prodotto', 'quantita', 'prezzo_unitario']  # opzionale, per impedire modifiche retroattive
+
+@admin.register(Utente)
+class UtenteAdmin(UserAdmin):
+    model = Utente
+    list_display = ['username', 'email', 'ruolo', 'is_staff', 'is_active']
 
 @admin.register(Ordine)
 class OrdineAdmin(admin.ModelAdmin):
@@ -32,3 +36,5 @@ class OrdineAdmin(admin.ModelAdmin):
 class ElementoOrdineAdmin(admin.ModelAdmin):
     list_display = ['ordine', 'prodotto', 'quantita', 'prezzo_unitario']
     search_fields = ['ordine__numero_ordine', 'prodotto__nome']
+
+
