@@ -1,4 +1,5 @@
 {% extends "index.html" %}
+{% load static %}
 {% block content %}
 <!-- Hero -->
 <div class="hero d-flex justify-content-center align-items-center text-white text-center" style="background: #2069b1bd center/cover no-repeat; height: 70vh;">
@@ -18,7 +19,7 @@
   </div>
   <div class="row">
       <div class="col-md-4">
-          <a href="#" class="text-decoration-none" id="books-category">
+          <a href="{% url 'ecommerce:catalogo' %}?categoria=libri" class="text-decoration-none" id="books-category">
               <div class="category-card" style="background-image: url('https://www.smartworld.it/images/2023/04/26/leggere-libri-app_880x495.jpg');">
                   <div class="category-overlay">
                       <h3 class="category-title">Libri</h3>
@@ -27,7 +28,7 @@
           </a>
       </div>
       <div class="col-md-4">
-          <a href="#" class="text-decoration-none" id="candles-category">
+          <a href="{% url 'ecommerce:catalogo' %}?categoria=cereria" class="text-decoration-none" id="candles-category">
               <div class="category-card" style="background-image: url('https://www.ciniltanilibrishop.it/wp-content/uploads/2020/06/cereria-logo-300x150.jpg');">
                   <div class="category-overlay">
                       <h3 class="category-title">Cereria</h3>
@@ -36,7 +37,7 @@
           </a>
       </div>
       <div class="col-md-4">
-          <a href="#" class="text-decoration-none" id="incense-category">
+          <a href="{% url 'ecommerce:catalogo' %}?categoria=incenso-carboncini" class="text-decoration-none" id="incense-category">
               <div class="category-card" style="background-image: url('https://www.ciniltanilibrishop.it/wp-content/uploads/2020/04/incenso-bethelem.jpg');">
                   <div class="category-overlay">
                       <h3 class="category-title">Incenso e Carboncini</h3>
@@ -47,7 +48,7 @@
   </div>
   <div class="row mt-4">
       <div class="col-md-4">
-          <a href="#" class="text-decoration-none" id="wine-category">
+          <a href="{% url 'ecommerce:catalogo' %}?categoria=santa_messa" class="text-decoration-none" id="wine-category">
               <div class="category-card" style="background-image: url('https://i0.wp.com/www.minimannamoments.com/wp-content/uploads/2019/03/wafer-wine.jpg?w=423&ssl=1');">
                   <div class="category-overlay">
                       <h3 class="category-title">Vino e Ostie per S. Messa</h3>
@@ -56,7 +57,7 @@
           </a>
       </div>
       <div class="col-md-4">
-          <a href="#" class="text-decoration-none" id="objects-category">
+          <a href="{% url 'ecommerce:catalogo' %}?categoria=oggettistica" class="text-decoration-none" id="objects-category">
               <div class="category-card" style="background-image: url('https://rosaricapitale.com/wp-content/uploads/2022/09/6A2A8528-6968-4FC4-9F5A-1577D428F39F-2048x2048.jpeg');">
                   <div class="category-overlay">
                       <h3 class="category-title">Oggettistica</h3>
@@ -65,10 +66,10 @@
           </a>
       </div>
       <div class="col-md-4">
-          <a href="#" class="text-decoration-none" id="oratory-category">
-              <div class="category-card" style="background-image: url('https://www.chiesadimilano.it/pgfom/files/2025/03/logo-oratorio-estivo-2025-sito.png');">
+          <a href="#" class="text-decoration-none" id="image-category">
+              <div class="category-card" style="background-image: url('{% static 'assets/categorie-immaginette.jpg' %}');">
                   <div class="category-overlay">
-                      <h3 class="category-title">Oratorio Estivo</h3>
+                      <h3 class="category-title">Immaginette</h3>
                   </div>
               </div>
           </a>

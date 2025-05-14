@@ -71,6 +71,9 @@ def dettaglio_prodotto(request, pk):
 def contatti(request):
     return render(request, 'contatti.html')
 
+def privacy_policy(request):
+    return render(request, 'privacy_policy.html')
+
 @login_required
 def visualizza_profilo(request):
     utente = request.user # L'oggetto Utente dell'utente loggato

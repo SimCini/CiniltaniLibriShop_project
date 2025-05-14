@@ -23,5 +23,6 @@ urlpatterns = [
     path('rimuovi_dal_carrello/<int:pk>/', views.rimuovi_dal_carrello, name='rimuovi_dal_carrello'),
     path('svuota-carrello/', views.svuota_carrello, name='svuota_carrello'),
     path('checkout/', views.checkout, name='checkout'),
+    path('privacy_policy/', views.privacy_policy, name='privacy_policy'),
 
 ]
