@@ -102,7 +102,7 @@ def visualizza_carrello(request):
         'totale': round(totale, 2),
     }
     
-    return render(request, 'carrello_prova.html', context)
+    return render(request, 'carrello.html', context)
 
 @login_required
 def aggiungi_al_carrello(request, pk):
@@ -166,37 +166,49 @@ def aggiorna_carrello(request, item_id):
     return redirect('ecommerce:visualizza_carrello')
 
 @login_required
-def rimuovi_dal_carrello(request, item_id):
+def rimuovi_dal_carrello(request, pk):
+    '''
     if request.method == 'POST':
-        item = get_object_or_404(Carrello, id=item_id, utente=request.user)
-        item.delete()
-        
-        # Se la richiesta è AJAX, restituisci un JSON response
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            carrello_prodotti = Carrello.objects.filter(utente=request.user)
-            
-            subtotale = 0
-            for cart_item in carrello_prodotti:
-                prod_prezzo = (cart_item.prodotto.prezzo_scontato 
-                             if cart_item.prodotto.prezzo_scontato and 
-                             cart_item.prodotto.prezzo_scontato < cart_item.prodotto.prezzo 
-                             else cart_item.prodotto.prezzo)
-                subtotale += prod_prezzo * cart_item.quantita
-            
-            spedizione_gratuita = subtotale >= 100
-            costo_spedizione = 0 if spedizione_gratuita else 5.90
-            totale = subtotale + costo_spedizione
-            
-            return JsonResponse({
-                'success': True,
-                'subtotale': round(subtotale, 2),
-                'costo_spedizione': round(costo_spedizione, 2),
-                'spedizione_gratuita': spedizione_gratuita,
-                'totale': round(totale, 2),
-                'carrello_vuoto': not carrello_prodotti.exists(),
-            })
-            
+        try:
+            item = get_object_or_404(Carrello, id=pk, utente=request.user)
+            item.delete()
+
+            # Se la richiesta è AJAX, restituisci un JSON response con i dati aggiornati del carrello
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                carrello_prodotti = Carrello.objects.filter(utente=request.user)
+                subtotale = 0
+                for cart_item in carrello_prodotti:
+                    # Calcola il prezzo scontato se disponibile, altrimenti usa il prezzo normale
+                    prod_prezzo = cart_item.prodotto.prezzo_scontato if (
+                        cart_item.prodotto.prezzo_scontato is not None and
+                        cart_item.prodotto.prezzo_scontato < cart_item.prodotto.prezzo
+                    ) else cart_item.prodotto.prezzo
+                    subtotale += prod_prezzo * cart_item.quantita
+
+                spedizione_gratuita = subtotale >= 100
+                costo_spedizione = 0 if spedizione_gratuita else 5.90
+                totale = subtotale + costo_spedizione
+
+                return JsonResponse({
+                    'success': True,
+                    'subtotale': round(subtotale, 2),
+                    'costo_spedizione': round(costo_spedizione, 2),
+                    'spedizione_gratuita': spedizione_gratuita,
+                    'totale': round(totale, 2),
+                    'carrello_vuoto': not carrello_prodotti.exists(),
+                })
+            else:
+                return redirect('ecommerce:visualizza_carrello')
+        except Carrello.DoesNotExist:
+            # Gestisci il caso in cui l'elemento del carrello non esiste (opzionale)
+            return JsonResponse({'success': False, 'error': 'Elemento non trovato nel carrello.'}, status=404)
+    else:
+        return redirect('ecommerce:visualizza_carrello')'''
+    if request.method == 'POST':
+        Carrello.objects.filter(id=pk, utente=request.user).delete()
+
     return redirect('ecommerce:visualizza_carrello')
+
 
 @login_required
 def svuota_carrello(request):

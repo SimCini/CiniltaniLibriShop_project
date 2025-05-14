@@ -66,9 +66,12 @@
                                                 {% endif %}
                                             </td>
                                             <td class="align-middle text-center">
-                                                <button onclick="rimuoviDalCarrello('{{ item.id }}')" class="btn btn-sm btn-outline-danger">
+                                                <form method="post" action="{% url 'ecommerce:rimuovi_dal_carrello' item.id %}">
+                                                    {% csrf_token %}
+                                                    <button onclick="rimuoviDalCarrello('{{ item.id }}')" class="btn btn-sm btn-outline-danger">
                                                     <i class="fas fa-trash-alt"></i>
-                                                </button>
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                         {% endfor %}
@@ -305,53 +308,6 @@ function updateCarrello(itemId) {
             .catch(error => console.error('Errore nell\'aggiornamento del carrello:', error));
         }
     }
-}
-
-// Funzione per rimuovere un prodotto dal carrello
-function rimuoviDalCarrello(itemId) {
-    const csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-    const formData = new FormData();
-    formData.append('csrfmiddlewaretoken', csrf_token);
-    
-    fetch(`/ecommerce/rimuovi-dal-carrello/${itemId}/`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Rimuovi la riga con animazione
-            const itemRow = document.getElementById(`item-row-${itemId}`);
-            if (itemRow) {
-                itemRow.classList.add('fade-out');
-                setTimeout(() => {
-                    itemRow.remove();
-                    
-                    // Verifica se il carrello è vuoto
-                    if (data.carrello_vuoto) {
-                        mostraCarrelloVuoto();
-                    } else {
-                        // Aggiorna il riepilogo
-                        document.getElementById('cart-subtotal').textContent = `€${data.subtotale.toFixed(2)}`;
-                        
-                        if (data.spedizione_gratuita) {
-                            document.getElementById('cart-shipping').textContent = 'Gratuita';
-                            document.getElementById('cart-shipping').classList.add('text-success');
-                        } else {
-                            document.getElementById('cart-shipping').textContent = `€${data.costo_spedizione.toFixed(2)}`;
-                            document.getElementById('cart-shipping').classList.remove('text-success');
-                        }
-                        
-                        document.getElementById('cart-total').textContent = `€${data.totale.toFixed(2)}`;
-                    }
-                }, 500);
-            }
-        }
-    })
-    .catch(error => console.error('Errore nella rimozione dal carrello:', error));
 }
 
 // Funzione per mostrare il carrello vuoto
