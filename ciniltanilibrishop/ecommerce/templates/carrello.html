@@ -25,7 +25,7 @@
                                         <tr id="item-row-{{ item.id }}" class="cart-item" data-id="{{ item.id }}">
                                             <td class="align-middle">
                                                 <div class="d-flex align-items-center">
-                                                    <div class="me-3" style="width: 80px; height: 80px;">
+                                                    <div class="me-3 prodotto-img flex-shrink-0">
                                                         {% if item.prodotto.foto %}
                                                             <img src="{{ item.prodotto.foto.url }}" class="img-fluid rounded" alt="{{ item.prodotto.nome }}">
                                                         {% else %}
@@ -185,11 +185,14 @@
     }
     
     .prodotto-img {
-        position: relative;
-        height: 200px;
-        overflow: hidden;
+    width: 100%;
+    max-width: 80px; /* o qualsiasi dimensione massima desideri */
+    max-height: 100px;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    flex-shrink: 0;
     }
-    
+
     .prodotto-img img {
         width: 100%;
         height: 100%;
