@@ -233,11 +233,13 @@ function updateRowTotal(itemId) {
 
     if (quantityInput && totalSpan && unitPriceSpan) {
         const quantity = parseInt(quantityInput.value);
-        const unitPrice = parseFloat(unitPriceSpan.getAttribute('data-price'));
+        const rawPrice = unitPriceSpan.getAttribute('data-price').replace(',', '.');
+        const unitPrice = parseFloat(rawPrice);
 
         if (!isNaN(quantity) && !isNaN(unitPrice)) {
             const newTotal = quantity * unitPrice;
-            totalSpan.textContent = `€${newTotal.toFixed(2)}`;
+            const formattedTotal = newTotal.toFixed(2).replace('.', ',');
+            totalSpan.textContent = `€${formattedTotal}`;
         }
     }
 }
