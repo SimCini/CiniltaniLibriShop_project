@@ -290,7 +290,7 @@ function updateCarrello(itemId) {
             formData.append('csrfmiddlewaretoken', csrf_token);
             console.log('Invio formData:', quantity, csrf_token);
             
-            fetch(`/ecommerce/aggiorna-carrello/${itemId}/`, {
+            fetch(`/ecommerce/aggiorna_carrello/${itemId}/`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -301,20 +301,9 @@ function updateCarrello(itemId) {
             .then(data => {
                 console.log('Dati JSON ricevuti:', data);
                 if (data.success) {
-                    // Aggiorna il totale riga prodotto con valore calcolato lato server
-                    document.getElementById(`total-${itemId}`).textContent = `€${data.totale_prodotto.toFixed(2).replace('.', ',')}`;
-                    // Aggiorna il riepilogo dell'ordine
-                    document.getElementById('cart-subtotal').textContent = `€${data.subtotale.toFixed(2).replace('.', ',')}`;
-                    
-                    if (data.spedizione_gratuita) {
-                        document.getElementById('cart-shipping').textContent = 'Gratuita';
-                        document.getElementById('cart-shipping').classList.add('text-success');
-                    } else {
-                        document.getElementById('cart-shipping').textContent = `€${data.costo_spedizione.toFixed(2)}`;
-                        document.getElementById('cart-shipping').classList.remove('text-success');
-                    }
-                    
-                    document.getElementById('cart-total').textContent = `€${data.totale.toFixed(2).replace('.',',')}`;
+                    document.getElementById(`total-${itemId}`).textContent = `€${Number(data.totale_prodotto).toFixed(2).replace('.', ',')}`;
+                    document.getElementById('cart-subtotal').textContent = `€${Number(data.subtotale).toFixed(2).replace('.', ',')}`;
+                    document.getElementById('cart-total').textContent = `€${Number(data.totale).toFixed(2).replace('.', ',')}`;
                 }
             })
             .catch(error => console.error('Errore nell\'aggiornamento del carrello:', error));

@@ -125,21 +125,25 @@ def aggiungi_al_carrello(request, pk):
 @login_required
 def aggiorna_carrello(request, pk):
     if request.method == 'POST':
+        print(f"POST data: {request.POST}")
         item = get_object_or_404(Carrello, id=pk, utente=request.user)
+        print(f"Item trovato: {item}")
         
         try:
             nuova_quantita = int(request.POST.get('quantita', 1))
+            print(f"Quantità: {nuova_quantita}")
+
             if 1 <= nuova_quantita <= 99:
                 item.quantita = nuova_quantita
                 item.save()
-                
+                print(f"Quantità aggiornata nel database")
                 # Se la richiesta è AJAX, restituisci i dati aggiornati
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     prezzo_unitario = (item.prodotto.prezzo_scontato 
                                      if item.prodotto.prezzo_scontato and 
                                      item.prodotto.prezzo_scontato < item.prodotto.prezzo 
                                      else item.prodotto.prezzo)
-                    
+                    print(f"Prezzo unitario calcolato: {prezzo_unitario}")
                     totale_prodotto = prezzo_unitario * item.quantita
                     
                     # Ricalcola il totale del carrello
@@ -153,7 +157,7 @@ def aggiorna_carrello(request, pk):
                         subtotale += prod_prezzo * cart_item.quantita
                     
                     spedizione_gratuita = subtotale >= 100
-                    costo_spedizione = 0 if spedizione_gratuita else 5.90
+                    costo_spedizione = Decimal('0.00') if spedizione_gratuita else Decimal('5.90')
                     totale = subtotale + costo_spedizione
                     
                     return JsonResponse({
@@ -164,12 +168,15 @@ def aggiorna_carrello(request, pk):
                         'spedizione_gratuita': spedizione_gratuita,
                         'totale': round(totale, 2),
                     })
-        except (ValueError, TypeError):
+            # Quantità non valida
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'error': 'Quantità non valida'})
-            else:
-                return redirect('ecommerce:visualizza_carrello')
-            
+
+        except Exception as e:
+            print(f"Errore nella view aggiorna_carrello: {e}")
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': 'Errore interno'})
+    
     return redirect('ecommerce:visualizza_carrello')
 
 @login_required
