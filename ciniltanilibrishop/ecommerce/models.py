@@ -122,26 +122,28 @@ class Ordine(models.Model):
 
     @classmethod
     def crea_con_elementi(cls, utente, prodotti_quantita, stato='on-hold'):
-        """
-        Crea un ordine con una lista di tuple: [(prodotto, quantità), ...]
-        """
+        ultimo_ordine = cls.objects.order_by('-numero_ordine').first()
+        numero_ordine = ultimo_ordine.numero_ordine + 1 if ultimo_ordine else 1
+        
         ordine = cls.objects.create(
             utente=utente,
-            data_ordine=timezone.now(),
             stato=stato,
-            totale=Decimal('0.00')  # sarà aggiornato dopo
+            numero_ordine=numero_ordine,
+            totale=0
         )
 
-        totale = Decimal('0.00')
+        totale=0
         for prodotto, quantita in prodotti_quantita:
-            prezzo = prodotto.prezzo_scontato or prodotto.prezzo
+            prezzo_unitario = float(prodotto.prezzo)
+            subtotale = prezzo_unitario * quantita
+            totale += subtotale
+
             ElementoOrdine.objects.create(
                 ordine=ordine,
                 prodotto=prodotto,
                 quantita=quantita,
-                prezzo_unitario=prezzo
+                prezzo_unitario=prodotto.prezzo
             )
-            totale += prezzo * quantita
 
         ordine.totale = totale
         ordine.save()

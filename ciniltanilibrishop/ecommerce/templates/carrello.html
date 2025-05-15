@@ -111,7 +111,8 @@
                                 {% if spedizione_gratuita %}
                                     <span id="cart-shipping" class="text-success">Gratuita</span>
                                 {% else %}
-                                    <span id="cart-shipping">€{{ costo_spedizione|floatformat:2 }}</span>
+                                    <!--<span id="cart-shipping">€{{ costo_spedizione|floatformat:2 }}</span>-->
+                                    <span id="cart-shipping">€ 5,00</span>
                                 {% endif %}
                             </div>
                             <hr>
@@ -122,7 +123,7 @@
                             
                             <!-- Procedi all'ordine -->
                             <a href="{% url 'ecommerce:checkout' %}" class="btn btn-primary w-100">
-                                Procedi all'ordine
+                                Procedi con l'ordine
                             </a>
                         </div>
                     </div>
@@ -277,14 +278,17 @@ function decreaseQuantity(itemId) {
 function updateCarrello(itemId) {
     const quantityInput = document.getElementById(`quantity-${itemId}`);
     const csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-    
+    console.log('updateCarrello chiamata con itemId:', itemId);
+
     if (quantityInput) {
         const quantity = parseInt(quantityInput.value);
+        console.log('Quantità letta:', quantity);
         
         if (!isNaN(quantity) && quantity >= 1 && quantity <= 99) {
             const formData = new FormData();
             formData.append('quantita', quantity);
             formData.append('csrfmiddlewaretoken', csrf_token);
+            console.log('Invio formData:', quantity, csrf_token);
             
             fetch(`/ecommerce/aggiorna-carrello/${itemId}/`, {
                 method: 'POST',
@@ -295,9 +299,12 @@ function updateCarrello(itemId) {
             })
             .then(response => response.json())
             .then(data => {
+                console.log('Dati JSON ricevuti:', data);
                 if (data.success) {
+                    // Aggiorna il totale riga prodotto con valore calcolato lato server
+                    document.getElementById(`total-${itemId}`).textContent = `€${data.totale_prodotto.toFixed(2).replace('.', ',')}`;
                     // Aggiorna il riepilogo dell'ordine
-                    document.getElementById('cart-subtotal').textContent = `€${data.subtotale.toFixed(2)}`;
+                    document.getElementById('cart-subtotal').textContent = `€${data.subtotale.toFixed(2).replace('.', ',')}`;
                     
                     if (data.spedizione_gratuita) {
                         document.getElementById('cart-shipping').textContent = 'Gratuita';
@@ -307,7 +314,7 @@ function updateCarrello(itemId) {
                         document.getElementById('cart-shipping').classList.remove('text-success');
                     }
                     
-                    document.getElementById('cart-total').textContent = `€${data.totale.toFixed(2)}`;
+                    document.getElementById('cart-total').textContent = `€${data.totale.toFixed(2).replace('.',',')}`;
                 }
             })
             .catch(error => console.error('Errore nell\'aggiornamento del carrello:', error));

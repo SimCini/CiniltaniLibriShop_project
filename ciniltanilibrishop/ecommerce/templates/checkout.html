@@ -1,0 +1,69 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    {% if ordine_completato %}
+      <div class="alert alert-success text-center">
+        <h4 class="mb-3">Ordine completato con successo!</h4>
+        <p>Grazie per il tuo acquisto. Il numero del tuo ordine è <strong>#{{ numero_ordine }}</strong>.</p>
+        <a href="{% url 'ecommerce:catalogo' %}" class="btn btn-primary mt-3">Torna al catalogo</a>
+      </div>
+    {% else %}
+      <h3 class="mb-4">Riepilogo ordine</h3>
+      <div class="row">
+        <div class="col-md-8">
+          <table class="table table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>Prodotto</th>
+                <th>Quantità</th>
+                <th>Prezzo</th>
+                <th>Totale</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in carrello_items %}
+              <tr>
+                <td>{{ item.prodotto.nome }}</td>
+                <td>{{ item.quantita }}</td>
+                <td>€{{ item.prodotto.prezzo_scontato|default:item.prodotto.prezzo|floatformat:2 }}</td>
+                <td>
+                  {% with prezzo=item.prodotto.prezzo_scontato|default:item.prodotto.prezzo %}
+                    €{{ prezzo|floatformat:2|floatformat:2|add:item.quantita|floatformat:2 }}
+                  {% endwith %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-4">
+          <div class="card border shadow-sm">
+            <div class="card-body">
+              <p>Subtotale: <strong>€{{ subtotale|floatformat:2 }}</strong></p>
+              <p>Spedizione: <strong>{% if costo_spedizione == 0 %}Gratuita{% else %}€{{ costo_spedizione|floatformat:2 }}{% endif %}</strong></p>
+              <hr>
+              <h5>Totale: €{{ totale|floatformat:2 }}</h5>
+              <form method="post">
+                {% csrf_token %}
+                <div class="mb-3 mt-4">
+                  <label class="form-label">Metodo di pagamento</label>
+                  <select class="form-select" name="metodo_pagamento" required>
+                    <option value="">-- Seleziona --</option>
+                    <option value="bonifico">Bonifico Bancario</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="contrassegno">Contrassegno</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Conferma ordine</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
