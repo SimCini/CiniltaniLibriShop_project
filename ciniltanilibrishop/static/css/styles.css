@@ -956,6 +956,11 @@ main {
   margin-top: 1rem;
 }
 
+.cta-buttons > form{
+  flex: 1;
+  display: flex;
+}
+
 .add-to-cart {
   padding: 0.75rem 1.5rem;
   background-color:#2061A2;
@@ -964,8 +969,12 @@ main {
   border-radius: 4px;
   font-weight: 600;
   cursor: pointer;
+  display: flex;
   transition: background-color 0.3s;
   flex: 2;
+  justify-content: center;
+  align-items: center;
+  text-align: center; 
 }
 
 .add-to-cart:hover {

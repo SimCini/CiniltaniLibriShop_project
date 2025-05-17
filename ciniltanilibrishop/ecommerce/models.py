@@ -103,10 +103,17 @@ class Ordine(models.Model):
         # Aggiungi altri stati rilevanti se necessario
     ]
 
+    #MODALITA_PAGAMENTO = [
+    #    ('bonifico', 'Bonifico'),
+    #    ('paypal', 'PayPal'),
+    #    ('carte', 'Carte di credito'),
+    #]
+
     numero_ordine = models.PositiveIntegerField(unique=True)
     utente = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='ordini')
     data_ordine = models.DateTimeField(default=ora_italiana_default())
     data_pagamento = models.DateTimeField(null=True, blank=True)
+    #modalita_pagamento = models.CharField(cmax_length=20, choices=MODALITA_PAGAMENTO)
     stato = models.CharField(max_length=20, choices=STATUS_CHOICES)
     totale = models.DecimalField(max_digits=10, decimal_places=2)
 

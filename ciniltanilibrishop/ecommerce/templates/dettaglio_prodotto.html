@@ -29,14 +29,17 @@
             </div>
             
             <div>
-                <div class="quantity-selector">
+                <!--<div class="quantity-selector">
                     <button class="quantity-btn">-</button>
                     <input type="number" class="quantity-input" value="1" min="1">
                     <button class="quantity-btn">+</button>
-                </div>
+                </div>-->
                 
                 <div class="cta-buttons">
-                    <button class="add-to-cart">Aggiungi al Carrello</button>
+                    <form action="{% url 'ecommerce:aggiungi_al_carrello' prodotto.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="add-to-cart">Aggiungi al Carrello</button>
+                    </form>
                 </div>
             </div>
         </div>
