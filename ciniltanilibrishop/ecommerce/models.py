@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.conf import settings
 from django.utils import timezone
+from django.db import transaction
 from datetime import timedelta
 
 #installare cloudinary su django (pip install cloudinary django-cloudinary-storage)
@@ -115,39 +116,43 @@ class Ordine(models.Model):
         ordering = ['-data_ordine']
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            super().save(*args, **kwargs)  # salva l'ordine prima per avere un ID
-        self.totale = sum(riga.quantita * riga.prezzo_unitario for riga in self.righe.all())
+        is_new = self.pk is None
         super().save(*args, **kwargs)
+
+        if not is_new:
+            # solo se non è la prima creazione, aggiorni il totale
+            self.totale = sum(riga.quantita * riga.prezzo_unitario for riga in self.righe.all())
+            super().save(update_fields=['totale'])
 
     @classmethod
     def crea_con_elementi(cls, utente, prodotti_quantita, stato='on-hold'):
-        ultimo_ordine = cls.objects.order_by('-numero_ordine').first()
-        numero_ordine = ultimo_ordine.numero_ordine + 1 if ultimo_ordine else 1
-        
-        ordine = cls.objects.create(
-            utente=utente,
-            stato=stato,
-            numero_ordine=numero_ordine,
-            totale=0
-        )
+        with transaction.atomic():
+            ultimo_ordine = cls.objects.select_for_update().order_by('-numero_ordine').first()
+            numero_ordine = ultimo_ordine.numero_ordine + 1 if ultimo_ordine else 1
 
-        totale=0
-        for prodotto, quantita in prodotti_quantita:
-            prezzo_unitario = float(prodotto.prezzo)
-            subtotale = prezzo_unitario * quantita
-            totale += subtotale
-
-            ElementoOrdine.objects.create(
-                ordine=ordine,
-                prodotto=prodotto,
-                quantita=quantita,
-                prezzo_unitario=prodotto.prezzo
+            ordine = cls.objects.create(
+                utente=utente,
+                stato=stato,
+                numero_ordine=numero_ordine,
+                totale=0
             )
 
-        ordine.totale = totale
-        ordine.save()
-        return ordine
+            totale = 0
+            for prodotto, quantita in prodotti_quantita:
+                prezzo_unitario = float(prodotto.prezzo)
+                subtotale = prezzo_unitario * quantita
+                totale += subtotale
+
+                ElementoOrdine.objects.create(
+                    ordine=ordine,
+                    prodotto=prodotto,
+                    quantita=quantita,
+                    prezzo_unitario=prodotto.prezzo
+                )
+
+            ordine.totale = totale
+            ordine.save()
+            return ordine
 
     def __str__(self):
         return f"Ordine #{self.numero_ordine} - {self.utente.username}"

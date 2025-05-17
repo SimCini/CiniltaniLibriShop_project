@@ -157,7 +157,7 @@ def aggiorna_carrello(request, pk):
                         subtotale += prod_prezzo * cart_item.quantita
                     
                     spedizione_gratuita = subtotale >= 100
-                    costo_spedizione = Decimal('0.00') if spedizione_gratuita else Decimal('5.90')
+                    costo_spedizione = Decimal('0.00') if spedizione_gratuita else Decimal('5.00')
                     totale = subtotale + costo_spedizione
                     
                     return JsonResponse({
@@ -220,10 +220,14 @@ def checkout(request):
 
         return render(request, 'checkout.html', {
             'ordine_completato': True,
-            'numero_ordine': numero_ordine
+            'numero_ordine': ordine.numero_ordine,
         })
 
-    # GET: riepilogo
+    # Calcolo totali per ogni item
+    for item in carrello_items:
+        prezzo = item.prodotto.prezzo_scontato or item.prodotto.prezzo
+        item.totale = prezzo * item.quantita  # aggiungi attributo dinamico
+
     subtotale = Decimal('0.00')
     for item in carrello_items:
         prezzo = item.prodotto.prezzo_scontato or item.prodotto.prezzo

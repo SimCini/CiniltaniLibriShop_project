@@ -11,9 +11,9 @@
         <a href="{% url 'ecommerce:catalogo' %}" class="btn btn-primary mt-3">Torna al catalogo</a>
       </div>
     {% else %}
-      <h3 class="mb-4">Riepilogo ordine</h3>
+      <h3 class="mb-4" style="color:#2061A2;">Riepilogo ordine</h3>
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
           <table class="table table-bordered">
             <thead class="table-light">
               <tr>
@@ -30,35 +30,41 @@
                 <td>{{ item.quantita }}</td>
                 <td>€{{ item.prodotto.prezzo_scontato|default:item.prodotto.prezzo|floatformat:2 }}</td>
                 <td>
-                  {% with prezzo=item.prodotto.prezzo_scontato|default:item.prodotto.prezzo %}
-                    €{{ prezzo|floatformat:2|floatformat:2|add:item.quantita|floatformat:2 }}
-                  {% endwith %}
+                  {{ item.totale|floatformat:2 }}
                 </td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
           <div class="card border shadow-sm">
             <div class="card-body">
               <p>Subtotale: <strong>€{{ subtotale|floatformat:2 }}</strong></p>
               <p>Spedizione: <strong>{% if costo_spedizione == 0 %}Gratuita{% else %}€{{ costo_spedizione|floatformat:2 }}{% endif %}</strong></p>
               <hr>
               <h5>Totale: €{{ totale|floatformat:2 }}</h5>
-              <form method="post">
+              <form id="checkout-form" method="post" novalidate>
                 {% csrf_token %}
                 <div class="mb-3 mt-4">
                   <label class="form-label">Metodo di pagamento</label>
-                  <select class="form-select" name="metodo_pagamento" required>
+                  <select class="form-select" name="metodo_pagamento" id="metodo_pagamento" required>
                     <option value="">-- Seleziona --</option>
                     <option value="bonifico">Bonifico Bancario</option>
                     <option value="paypal">PayPal</option>
-                    <option value="contrassegno">Contrassegno</option>
+                    <option value="carta">Carta di credito</option>
                   </select>
                 </div>
-                <button type="submit" class="btn btn-success w-100">Conferma ordine</button>
+                <div id="campo-pagamento-specifico"></div>
+                <button type="submit" class="btn btn-primary w-100">Conferma ordine</button>
               </form>
+              <!-- Div animazione pagamento, nascosto di default -->
+              <div id="payment-animation" style="display:none; text-align:center; margin-top:20px;">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Elaborazione pagamento in corso...</p>
+              </div>
             </div>
           </div>
         </div>
@@ -66,4 +72,121 @@
     {% endif %}
   </div>
 </section>
+
+<style>
+  .btn-primary {
+      background-color: #2061A2;
+      border-color: #2061A2;
+  }
+        
+  .btn-primary:hover {
+      background-color: #3E3380;
+      border-color: #3E3380;
+  }
+
+</style>
+
+<script>
+  document.getElementById('checkout-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // blocca submit automatico
+
+    // Controlla che sia stato selezionato un metodo pagamento
+    const metodo = this.metodo_pagamento.value;
+    if (!metodo) {
+      alert('Seleziona un metodo di pagamento.');
+      return;
+    }
+
+    // Controlli specifici per ogni metodo
+    if (metodo === 'bonifico') {
+      const iban = document.getElementById('iban').value.trim();
+      if (!iban || iban.length < 15) {
+        alert('Inserisci un IBAN valido.');
+        return;
+      }
+    }
+
+    if (metodo === 'paypal') {
+      const email = document.getElementById('paypal_email').value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert('Inserisci un\'email PayPal valida.');
+        return;
+      }
+    }
+
+    if (metodo === 'carta') {
+      const numero = document.getElementById('numero_carta').value.trim().replace(/\s+/g, '');
+      const scadenza = document.getElementById('scadenza_carta').value;
+      const cvv = document.getElementById('cvv_carta').value.trim();
+
+      if (!/^\d{13,19}$/.test(numero)) {
+        alert('Numero carta non valido. Deve contenere solo numeri (13-19 cifre).');
+        return;
+      }
+
+      if (!scadenza) {
+        alert('Inserisci una data di scadenza.');
+        return;
+      }
+
+      if (!/^\d{3,4}$/.test(cvv)) {
+        alert('CVV non valido. Deve essere di 3 o 4 cifre.');
+        return;
+      }
+    }
+
+    // Popup di conferma
+    if (confirm('Sei sicuro di voler confermare l\'ordine?')) {
+      this.querySelector('button[type="submit"]').disabled = true;
+      this.style.display = 'none';
+
+      // Mostra animazione
+      document.getElementById('payment-animation').style.display = 'block';
+
+      // Simula elaborazione pagamento (3 secondi)
+      setTimeout(() => {
+        // Dopo animazione, invia form al server (ora senza bloccare)
+        this.submit();
+      }, 3000);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+  const metodoSelect = document.getElementById('metodo_pagamento');
+  const campoPagamentoDiv = document.getElementById('campo-pagamento-specifico');
+
+  metodoSelect.addEventListener('change', function() {
+    const metodo = metodoSelect.value;
+    let html = '';
+
+    if (metodo == 'bonifico') {
+      html = '<div class="mb-3">' +
+             '<label for="iban" class="form-label">IBAN</label>' +
+             '<input type="text" class="form-control" name="iban" id="iban" placeholder="Inserisci IBAN" required>' +
+             '</div>';
+    } else if (metodo == 'paypal') {
+      html = '<div class="mb-3">' +
+             '<label for="paypal_email" class="form-label">Email PayPal</label>' +
+             '<input type="email" class="form-control" name="paypal_email" id="paypal_email" placeholder="Inserisci email PayPal" required>' +
+             '</div>';
+    } else if (metodo == 'carta') {
+      html = '<div class="mb-3">' +
+             '<label for="numero_carta" class="form-label">Numero Carta di Credito</label>' +
+             '<input type="text" class="form-control" name="numero_carta" id="numero_carta" placeholder="XXXX XXXX XXXX XXXX" required maxlength="19" pattern="\\d{13,19}">' +
+             '</div>' +
+             '<div class="mb-3">' +
+             '<label for="scadenza_carta" class="form-label">Data Scadenza</label>' +
+             '<input type="month" class="form-control" name="scadenza_carta" id="scadenza_carta" required>' +
+             '</div>' +
+             '<div class="mb-3">' +
+             '<label for="cvv_carta" class="form-label">CVV</label>' +
+             '<input type="text" class="form-control" name="cvv_carta" id="cvv_carta" placeholder="XXX" required maxlength="4" pattern="\\d{3,4}">' +
+             '</div>';
+    }
+
+      campoPagamentoDiv.innerHTML = html;
+    });
+  });
+</script>
 {% endblock %}
