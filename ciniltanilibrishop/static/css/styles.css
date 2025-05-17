@@ -211,6 +211,14 @@ margin-left: 20px;
   width: 100%;
 }
 
+.menu a.active {
+  color: #2061A2;
+}
+
+.menu a.active::after {
+  width: 100%;
+}
+
 .form-inline {
   display: flex;
   align-items: center;

@@ -1,13 +1,16 @@
 {% extends "index.html" %}
 {% load static %}
 {% block content %}
+<a href="javascript:history.back()" class="back-link">
+    ← Torna indietro
+</a>
 <header>
     <h1>Informativa Privacy</h1>
 </header>
 
 <section>
     <p>
-        Ai sensi e per gli effetti degli articoli 12 e 13 del Regolamento Europeo 27 aprile 2016, n. 679 (in breve anche "GDPR") il Titolare del Trattamento desidera fornire le seguenti informazioni ai propri utenti/clienti, anche a seguito del conferimento di informazioni attraverso il sito web <a href="http://www.ciniltanilibrishop.it">www.ciniltanilibrishop.it</a> (di seguito anche il "Sito").
+        Ai sensi e per gli effetti degli articoli 12 e 13 del Regolamento Europeo 27 aprile 2016, n. 679 (in breve anche "GDPR") il Titolare del Trattamento desidera fornire le seguenti informazioni ai propri utenti/clienti, anche a seguito del conferimento di informazioni attraverso il sito web <a href="#">www.ciniltanilibrishop.it</a> (di seguito anche il "Sito").
     </p>
 
     <h2>Estremi identificativi e di contatto del Titolare del Trattamento</h2>
@@ -70,6 +73,12 @@
     </p>
 
     <p>&copy; 2025 CINILTANI STEFANO ATTILIO</p>
+
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <a class="btn btn-lg" id="accept-terms-btn">Accetto i Termini e le Condizioni</a>
+        </div>
+    </div>
 </section>
 
 <style>
@@ -85,7 +94,7 @@
         color: #2061A2;
         padding: 20px;
         text-align: center;
-        margin-top: 30px;
+        margin-top: 20px;
     }
 
     h1 {
@@ -114,7 +123,7 @@
     }
 
     a {
-        color: #4CAF50;
+        color: #2061A2;
     }
 
     ul {
@@ -123,5 +132,43 @@
         margin-bottom: 15px;
         padding-left: 20px;
     }
+
+    .back-link {
+      color: #555;
+      padding: 10px;
+      text-decoration: none;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
+      transition: color 0.3s, transform 0.2s;
+    }
+
+    .back-link:hover {
+      color: #000;
+      transform: translateX(-2px);
+    }
+
+    #accept-terms-btn{
+    border-color: #2061A2;
+    color:white;
+    background-color: #2061A2; 
+    border-radius: 10px;;
+    }
 </style>
+
+<script>
+  document.getElementById('accept-terms-btn').addEventListener('click', function () {
+    // Salva il consenso nel localStorage o esegui altra logica
+    localStorage.setItem('termsAccepted', 'true');
+
+    // Mostra messaggio o prosegui con azione successiva
+    alert('Hai accettato i termini e le condizioni. Grazie.');
+    
+    // Reindirizza alla pagina precedente
+    window.history.back();
+  });
+</script>
+
 {% endblock %}

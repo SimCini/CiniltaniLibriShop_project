@@ -27,10 +27,10 @@
                 </div>
             </div>
                 <div class="menu">
-                    <a href="{% url 'ecommerce:homepage'%}">HOME</a>
-                    <a href="{% url 'ecommerce:catalogo'%}">CATALOGO</a>
-                    <a href="{% url 'ecommerce:chi_sono'%}">CHI SONO</a>
-                    <a href="{% url 'ecommerce:contatti'%}">CONTATTI</a>
+                    <a href="{% url 'ecommerce:homepage'%}" class="{% if request.resolver_match.url_name == 'homepage' %}active{% endif %}">HOME</a>
+                    <a href="{% url 'ecommerce:catalogo'%}" class="{% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">CATALOGO</a>
+                    <a href="{% url 'ecommerce:chi_sono'%}" class="{% if request.resolver_match.url_name == 'chi_sono' %}active{% endif %}">CHI SONO</a>
+                    <a href="{% url 'ecommerce:contatti'%}" class="{% if request.resolver_match.url_name == 'contatti' %}active{% endif %}">CONTATTI</a>
                 </div>
             </div>
             <div class="icons">
@@ -76,7 +76,7 @@
         </script>
         <!-- Footer-->
         <footer class="py-5 bg-dark">
-            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; 2025 CiniltaniLibriShop <br>
+            <div class="container"><p class="m-0 text-center text-white"><a href="{% url 'ecommerce:privacy_policy' %}">Copyright &copy;</a> 2025 CiniltaniLibriShop <br>
                 Lista contatti:
                 -Email: info@ciniltanilibri.it
                 -Email: ordini@ciniltanilibri.it
