@@ -11,25 +11,61 @@
                     <h2 class="user-name">{{ utente.nome }} {{ utente.cognome }}</h2>
                     <p class="user-email">{{ utente.email }}</p>
                 </div>
+                {% if utente.ruolo == 'cliente' %}
+                    <button type="button"
+                            class="btn ruolo-btn btn-blu"
+                            disabled>
+                        {{ utente.ruolo }}
+                    </button>
+                {% elif utente.ruolo == 'amministratore' %}
+                    <a href="{% url 'admin:index' %}" class="btn ruolo-btn btn-rosso">
+                        {{ utente.ruolo }}
+                    </a>
+                {% endif %}
             </div>
 
             <ul class="nav-menu">
-                <li><a href="#" ><i>📋</i> I Miei Ordini</a></li>
-                <li><a href="#"><i>🏠</i> Indirizzi</a></li>
-                <li><a href="#"><i>👤</i> Dati Personali</a></li>
-                <li><a href="{% url 'ecommerce:logout' %}" class="active"><i>📤</i> Logout</a></li>
+                <li><a href="#" id="link-ordini" class="menu-link" onclick="caricaContenuto('ordini', this)"><i>📋</i> I Miei Ordini</a></li>
+                <li><a href="#" class="menu-link" onclick="caricaContenuto('indirizzi', this)"><i>🏠</i> Indirizzi</a></li>
+                <li><a href="#" class="menu-link" onclick="caricaContenuto('dati', this)"><i>👤</i> Dati Personali</a></li>
+                <li><a href="{% url 'ecommerce:logout' %}"><i>📤</i> Logout</a></li>
             </ul>
         </div>
         <div class="content-area">
-            <!--<div class="content-header">
-                <h2 class="content-title">I Miei Ordini</h2>
-                </div>
-
-            <table class="orders-table">
-                </table>-->
+            
         </div>
     </div>
 </main>
+<style>
+    .btn-blu {
+        background-color: #2061A2 !important; /* blu */
+        color: white;
+        cursor: not-allowed;
+    }
+    .btn-blu:hover {
+    background-color: #2061A2 !important; /* stesso colore per evitare cambi */
+    color: white !important; /* mantiene testo bianco */
+    }
+
+    .btn-rosso {
+        background-color:rgb(161, 36, 48) !important; /* rosso */
+        color: white;
+    }
+
+    .ruolo-btn {
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        line-height: 1;
+        border-radius: 0.25rem;
+    }
+
+    button[disabled] {
+        opacity: 1 !important;     /* forza opacità piena */
+        pointer-events: none;      /* impedisce clic */
+        color: white !important;   /* colore testo */
+        cursor: not-allowed;
+    }   
+</style>
 <script>
    // Script per la gestione degli ordini
     document.addEventListener('DOMContentLoaded', function() {
@@ -139,5 +175,111 @@ function filterOrders(orderRows, filterSelect, searchInput) {
         row.style.display = showRow ? '' : 'none';
     });
 }
+function caricaContenuto(sezione, elemento) {
+    const contentArea = document.querySelector('.content-area');
+
+    // Rimuovi la classe attiva da tutti i link
+    document.querySelectorAll('.menu-link').forEach(link => {
+        link.classList.remove('active');
+    });
+
+    // Aggiungi la classe attiva al link cliccato
+    if (elemento) {
+        elemento.classList.add('active');
+    }
+
+    let contenuto = '';
+    switch (sezione) {
+        case 'ordini':
+            contenuto = `
+            <div class="content-header">
+                <h2 class="content-title">I Miei Ordini</h2>
+                </div>
+                {% if ordini %}
+                    <table class="orders-table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Data</th>
+                            <th>Stato</th>
+                            <th>Totale</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for ordine in ordini %}
+                            <tr>
+                            <td>#{{ ordine.id }}</td>
+                            <td>{{ ordine.data_ordine|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="status-badge status-{{ ordine.stato|lower }}">
+                                {{ ordine.stato }}
+                                </span>
+                            </td>
+                            <td>€{{ ordine.totale }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p style="padding: 1rem; font-style: italic; color: #666;">
+                        Nessun ordine effettuato.
+                    </p>
+                    {% endif %}
+            `;
+            break;
+        case 'indirizzi':
+            contenuto = `
+            <div class="content-header">
+                <h2 class="content-title">I Miei Indirizzi</h2>
+            </div>
+                {% if utente.indirizzo %}
+                    <p><strong>Via:</strong> {{ utente.indirizzo }}</p>
+                    <p><strong>Città:</strong> {{ utente.citta }}</p>
+                    <p><strong>CAP:</strong> {{ utente.cap }}</p>
+                    <p><strong>Provincia:</strong> {{ utente.provincia }}</p>
+                    <p><strong>Nazione:</strong> {{ utente.paese }}</p>
+                    <a href="#" class="btn btn-warning mt-3" style="background-color:#2061A2;">Modifica Indirizzo</a>
+                {% else %}
+                    <p>Nessun indirizzo associato al tuo account.</p>
+                    <a href="#" class="btn btn-primary mt-3" style="background-color:#2061A2;">Aggiungi Indirizzo</a>
+                {% endif %}
+            `;
+            break;
+
+        case 'dati':
+    contenuto = `
+        <div class="content-header">
+            <h2 class="content-title">I Miei Dati</h2>
+        </div>
+        <div class="personal-data-view">
+            <div class="data-item">
+                <label><strong>Nome:</strong></label>
+                <p>{{ utente.nome }}</p>
+            </div>
+            <div class="data-item">
+                <label><strong>Cognome:</strong></label>
+                <p>{{ utente.cognome }}</p>
+            </div>
+            <div class="data-item">
+                <label><strong>Email:</strong></label>
+                <p>{{ utente.email }}</p>
+            </div>
+            <button type="button" class="btn btn-secondary mt-3" style="background-color:#2061A2;">Modifica Dati</button>
+        </div>
+    `;
+    break;
+        default:
+            contenuto = `<p>Sezione non trovata.</p>`;
+    }
+
+    contentArea.innerHTML = contenuto;
+}
+// Quando la pagina è pronta, seleziona la sezione "ordini" di default
+document.addEventListener('DOMContentLoaded', function () {
+    const defaultLink = document.getElementById('link-ordini');
+    if (defaultLink) {
+        caricaContenuto('ordini', defaultLink);
+    }
+});
 </script>
 {% endblock content %}

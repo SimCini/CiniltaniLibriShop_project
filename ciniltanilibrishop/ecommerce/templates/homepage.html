@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 <!-- Hero -->
-<div class="hero d-flex justify-content-center align-items-center text-white text-center" style="background: #2069b1bd center/cover no-repeat; height: 70vh;">
+<div class="hero d-flex justify-content-center align-items-center text-white text-center" style="background: #2061A2 center/cover no-repeat; height: 70vh;">
   <div style="padding: 2rem; border-radius: 1rem;">    
     <h1 id="titolo" class="grande"><b><span class="bordato">CiniltaniLibriShop</span></b></h1>
     <h3 class="bordato">Il libraio di casa tua</h3>
@@ -29,7 +29,7 @@
       </div>
       <div class="col-md-4">
           <a href="{% url 'ecommerce:catalogo' %}?categoria=cereria" class="text-decoration-none" id="candles-category">
-              <div class="category-card" style="background-image: url('https://www.ciniltanilibrishop.it/wp-content/uploads/2020/06/cereria-logo-300x150.jpg');">
+              <div class="category-card" style="background-image: url('{% static 'assets/categorie-cereria.jpg' %}');">
                   <div class="category-overlay">
                       <h3 class="category-title">Cereria</h3>
                   </div>
@@ -38,7 +38,7 @@
       </div>
       <div class="col-md-4">
           <a href="{% url 'ecommerce:catalogo' %}?categoria=incenso-carboncini" class="text-decoration-none" id="incense-category">
-              <div class="category-card" style="background-image: url('https://www.ciniltanilibrishop.it/wp-content/uploads/2020/04/incenso-bethelem.jpg');">
+              <div class="category-card" style="background-image: url('{% static 'assets/categorie-incenso-carboncini.jpg' %}');">
                   <div class="category-overlay">
                       <h3 class="category-title">Incenso e Carboncini</h3>
                   </div>
@@ -49,7 +49,7 @@
   <div class="row mt-4">
       <div class="col-md-4">
           <a href="{% url 'ecommerce:catalogo' %}?categoria=santa_messa" class="text-decoration-none" id="wine-category">
-              <div class="category-card" style="background-image: url('https://i0.wp.com/www.minimannamoments.com/wp-content/uploads/2019/03/wafer-wine.jpg?w=423&ssl=1');">
+              <div class="category-card" style="background-image: url('{% static 'assets/categorie-vino-ostie.jpg' %}');">
                   <div class="category-overlay">
                       <h3 class="category-title">Vino e Ostie per S. Messa</h3>
                   </div>
@@ -58,7 +58,7 @@
       </div>
       <div class="col-md-4">
           <a href="{% url 'ecommerce:catalogo' %}?categoria=oggettistica" class="text-decoration-none" id="objects-category">
-              <div class="category-card" style="background-image: url('https://rosaricapitale.com/wp-content/uploads/2022/09/6A2A8528-6968-4FC4-9F5A-1577D428F39F-2048x2048.jpeg');">
+              <div class="category-card" style="background-image: url('{% static 'assets/categorie-oggettistica.jpg' %}');">
                   <div class="category-overlay">
                       <h3 class="category-title">Oggettistica</h3>
                   </div>
