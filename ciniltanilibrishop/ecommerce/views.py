@@ -10,9 +10,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.utils import timezone
 from decimal import Decimal
+import random
 
 def homepage(request):
-    return render(request, 'homepage.html')
+    prodotti = list(Prodotto.objects.all())
+    prodotti_random = random.sample(prodotti, min(len(prodotti), 15))  # prodotti randomici o meno se meno disponibili
+    return render(request, 'homepage.html', {'prodotti_random': prodotti_random})
 
 def chi_sono(request):
     return render(request, 'chi_sono.html')

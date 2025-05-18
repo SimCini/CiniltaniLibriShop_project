@@ -55,6 +55,12 @@ class Prodotto(models.Model):
             return [sc[0] for sc in self.SOTTOCATEGORIE_OGGETTISTICA]
         return []
     
+    @property
+    def sconto(self):
+        if self.prezzo > 0:
+            return round((self.prezzo - self.prezzo_scontato) / self.prezzo * 100, 0)  # percentuale sconto
+        return 0
+    
     class Meta:
         verbose_name = "Prodotto"
         verbose_name_plural = "Prodotti"

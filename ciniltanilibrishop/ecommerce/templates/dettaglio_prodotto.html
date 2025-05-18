@@ -20,7 +20,7 @@
                     {% if prodotto.prezzo_scontato and prodotto.prezzo_scontato < prodotto.prezzo %}
                         <span>{{prodotto.prezzo_scontato}}</span>
                         <span class="old-price">{{prodotto.prezzo}}</span>
-                        <span class="discount-badge">-11%</span>
+                        <span class="discount-badge">-{{ prodotto.sconto }}%</span>
                     {% else %}
                         <span class="old-price">{{prodotto.prezzo}}</span>
                     {% endif %}

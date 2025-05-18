@@ -920,7 +920,7 @@ main {
 }
 
 .discount-badge {
-  background-color: #e74c3c;
+  background-color: green;
   color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
