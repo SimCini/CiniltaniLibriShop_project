@@ -55,7 +55,7 @@
                 </div>
 
                 <!-- Contenuto principale -->
-                <div class="col-lg-9">
+                <div class="col-lg-8">
                     <!-- Categorie di prodotti -->
                     <div style="display: flex; gap: 10px; padding: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
                       {% for categoria_codice, categoria_nome in categorie %}
@@ -135,7 +135,30 @@
                         {% endif %}
                     </div>
                 </div>
+
             </div>
+        </div>
+        <!-- Carrello fisso sul lato destro -->
+        <div class="cart-fixed d-none d-lg-block">
+
+            <h4 style="color:#2061A2; margin-top:68px;">Il tuo carrello</h4>
+
+            {% if carrello_items %}
+                <ul class="list-unstyled">
+                    {% for item in carrello_items %}
+                        <li class="mb-2">
+                            <strong>{{ item.prodotto.nome }}</strong><br>
+                            Quantità: {{ item.quantita }}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="d-grid">
+                    <a href="{% url 'ecommerce:visualizza_carrello' %}" class="btn btn-outline-primary mt-2">Vai al carrello</a>
+                </div>
+            {% else %}
+                <p>Il carrello è vuoto.</p>
+            {% endif %}
+
         </div>
     </section>
 
@@ -181,6 +204,88 @@
             color: white;
             border-color: #3E3380;
         }
+
+        .cart-sidebar .card {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-sidebar .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .cart-sidebar ul {
+            padding-left: 0;
+        }
+
+        .cart-fixed {
+            position: fixed;
+            top: 0px;
+            right: 0;
+            width: 300px;
+            height: calc(100vh - 56px); 
+            background-color: white;
+            color: black;
+            padding: 1rem;
+            box-shadow: -3px 0 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: -10;  
+        }
+
+        .cart-fixed .card {
+            background-color: transparent; /* carta trasparente */
+            border: none;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-fixed .card-header {
+            background-color: white; /* header bianco */
+            border-bottom: 1px solid #2061A2; /* linea sotto header blu */
+            padding-bottom: 0.5rem;
+            color: black;
+        }
+
+        .cart-fixed .card-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-top: 1rem;
+            color: black;
+        }
+
+        .cart-fixed ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .cart-fixed li {
+            border-bottom: 1px solid rgba(32, 97, 162, 0.2); /* linea leggera blu */
+            padding-bottom: 0.5rem;
+        }
+
+        .cart-fixed li:last-child {
+            border-bottom: none;
+        }
+
+        .cart-fixed a.btn-outline-primary {
+            color: #2061A2; /* blu bottone */
+            background-color: white;
+            border-color: #2061A2;
+            font-weight: 600;
+            transition: background-color 0.3s, color 0.3s;
+            margin-top: auto; /* sempre in fondo */
+        }
+
+        .cart-fixed a.btn-outline-primary:hover {
+            background-color: #2061A2;
+            color: white;
+            border-color: #3E3380;;
+        }
+
+
     </style>
     <script>
         function updatePriceLabel(val) {

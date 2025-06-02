@@ -59,12 +59,17 @@ def catalogo(request):
 
     categorie = [('tutti', 'Tutti')] + list(Prodotto.CATEGORIE)
 
+    carrello_items = []
+    if request.user.is_authenticated:
+        carrello_items = Carrello.objects.filter(utente=request.user)
+
     context = {
         'page_obj': page_obj,
         'categoria_attiva': categoria,
         'categorie': categorie,
         'prezzo_min': prezzo_min,
         'ordine_attivo': ordine,
+        'carrello_items': carrello_items,
     }
     return render(request, 'catalogo.html', context)
 
