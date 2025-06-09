@@ -11,6 +11,7 @@ from django.contrib.auth import authenticate, login
 from django.utils import timezone
 from decimal import Decimal
 import random
+from django.db.models import Sum
 
 def homepage(request):
     prodotti = list(Prodotto.objects.all())
@@ -127,6 +128,16 @@ def aggiungi_al_carrello(request, pk):
         # Se il prodotto è già nel carrello, incrementa la quantità
         carrello_item.quantita += 1
         carrello_item.save()
+
+    totale_articoli = Carrello.objects.filter(utente=request.user).aggregate(Sum('quantita'))['quantita__sum'] or 0
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({
+            'success': True,
+            'message': 'Prodotto aggiunto al carrello',
+            'quantita': carrello_item.quantita,
+            'cart_count': totale_articoli,
+        })
     
     return redirect('ecommerce:visualizza_carrello')
 

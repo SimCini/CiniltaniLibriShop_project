@@ -105,7 +105,15 @@
                                 </div>
                                 <!-- Product actions-->
                                 <div class="card-footer p-4 pt-0 border-top-0 bg-transparent" style="position:absolute; bottom:0; width:100%;">
-                                    <div class="text-center"><a class="btn-scopri" href="{% url 'ecommerce:aggiungi_al_carrello' prodotto.id %}" style="display:block;" >Aggiungi al carrello</a></div>
+                                    <div class="text-center">
+                                        <!--<a class="btn-scopri" href="{% url 'ecommerce:aggiungi_al_carrello' prodotto.id %}" style="display:block;" >Aggiungi al carrello</a>-->
+                                        <button 
+                                            class="btn-scopri add-to-cart-btn" 
+                                            data-id="{{ prodotto.id }}" 
+                                            style="display:block; width:100%;">
+                                            Aggiungi al carrello
+                                        </button>
+                                    </div>
                                 </div>
                               </div></a>
                             </div>
@@ -139,6 +147,7 @@
             </div>
         </div>
         <!-- Carrello fisso sul lato destro -->
+        <!--
         <div class="cart-fixed d-none d-lg-block">
 
             <h4 style="color:#2061A2; margin-top:68px;">Il tuo carrello</h4>
@@ -159,8 +168,10 @@
                 <p>Il carrello è vuoto.</p>
             {% endif %}
 
-        </div>
+        </div>-->
     </section>
+    <div id="toast-container" class="toast-msg"></div>
+    
 
     <!-- Stili aggiunti per i nuovi elementi -->
     <style>
@@ -285,7 +296,22 @@
             border-color: #3E3380;;
         }
 
-
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;   /* era top: 20px; */
+            right: 20px;
+            background-color: #2061A2;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .toast-msg.show {
+            opacity: 1;
+        }
     </style>
     <script>
         function updatePriceLabel(val) {
@@ -302,5 +328,49 @@
                 });
             }
         });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const csrftoken = '{{ csrf_token }}';
+
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();  // <-- impedisce che il link porti altrove
+                    const prodottoId = this.getAttribute('data-id');
+
+                    fetch(`/ecommerce/aggiungi-al-carrello/${prodottoId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const toast = document.getElementById('toast-container');
+                            toast.innerText = data.message;
+                            toast.classList.add('show');
+                            setTimeout(() => toast.classList.remove('show'), 3000);
+
+                            // AGGIORNA CONTATORE CARRELLO
+                            const countEl = document.getElementById('cart-count');
+                            if (countEl) {
+                                countEl.textContent = data.cart_count;
+                            } else {
+                                // Se il contatore non esiste (es. utente non loggato prima), lo crea
+                                const newCountEl = document.createElement('span');
+                                newCountEl.className = 'cart-count';
+                                newCountEl.id = 'cart-count';
+                                newCountEl.textContent = data.cart_count;
+                                document.querySelector('.fa-shopping-cart').parentElement.appendChild(newCountEl);
+                            }
+                        } else {
+                            alert('Errore nell\'aggiunta al carrello.');
+                        }
+                    });
+                });
+            });
+        });
     </script>
+    
 {% endblock %}
