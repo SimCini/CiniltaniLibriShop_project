@@ -12,6 +12,9 @@ from django.utils import timezone
 from decimal import Decimal
 import random
 from django.db.models import Sum
+from django.core.mail import send_mail
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 def homepage(request):
     prodotti = list(Prodotto.objects.all())
@@ -332,3 +335,26 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Logout effettuato con successo.')
     return redirect('ecommerce:homepage')
+
+@csrf_exempt
+def invia_email(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        autore = data.get('autore', '')
+        titolo = data.get('titolo', '')
+        isbn = data.get('isbn', '')
+        messaggio = data.get('messaggio', '')
+
+        corpo = f"Autore: {autore}\nTitolo: {titolo}\nISBN: {isbn}\nMessaggio: {messaggio}"
+
+        try:
+            send_mail(
+                'Modulo di richiesta ricevuto',
+                corpo,
+                'noreply@ciniltanilibrishop.it',
+                ['cin1tuber@gmail.com'],
+                fail_silently=False,
+            )
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})

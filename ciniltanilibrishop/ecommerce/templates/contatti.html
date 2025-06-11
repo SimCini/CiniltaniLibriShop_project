@@ -50,15 +50,15 @@
 <div class="form-content">
   <span class="close-btn" id="closeFormBtn">&times;</span>
   <center><h4>Modulo di Contatto</h4></center>
-    <form>
+    <form id="contactForm">
       <label for="autore">Autore:</label><br>
-      <input type="text" id="autore" name="autore"><br><br>
+      <input type="text" id="autore" name="autore" required><br><br>
   
       <label for="titolo">Titolo:</label><br>
-      <input type="text" id="titolo" name="titolo"><br><br>
+      <input type="text" id="titolo" name="titolo" required><br><br>
   
-      <label for="editore">ISBN:</label><br>
-      <input type="text" id="editore" name="editore"><br><br>
+      <label for="isbn">ISBN:</label><br>
+      <input type="text" id="isbn" name="isbn" required><br><br>
 
       <label for="messaggio">Informazioni aggiuntive (opzionale):</label><br>
       <textarea id="messaggio" name="messaggio" rows="4" cols="40"></textarea><br><br>
@@ -76,6 +76,65 @@
     document.getElementById("closeFormBtn").addEventListener("click", function () {
       document.getElementById("contactFormPopup").style.display = "none";
       document.getElementById("openFormBtn").style.display = "inline-block";
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const form = document.getElementById('contactForm');
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault(); // ⛔️ Blocca l'invio GET
+
+        const data = {
+          autore: document.getElementById('autore').value,
+          titolo: document.getElementById('titolo').value,
+          isbn: document.getElementById('isbn').value,
+          messaggio: document.getElementById('messaggio').value,
+        };
+
+        // Per test: stampa in console
+        console.log('Dati inviati:', data);
+
+        // Qui puoi fare la fetch, es.:
+        fetch('/ecommerce/invia_email/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(response => {
+          if (response.success) {
+            alert('Email inviata!');
+            // CHIUDI IL POPUP
+            document.getElementById('contactFormPopup').style.display = 'none';
+
+            // (Opzionale) Svuota il form
+            form.reset();
+          } else {
+            alert('Errore: ' + (response.error || 'Errore sconosciuto'));
+          }
+        })
+        .catch(error => {
+          console.error('Errore:', error);
+        });
+
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+      });
     });
   </script>
 {% endblock content %}

@@ -24,5 +24,5 @@ urlpatterns = [
     path('svuota-carrello/', views.svuota_carrello, name='svuota_carrello'),
     path('checkout/', views.checkout, name='checkout'),
     path('privacy_policy/', views.privacy_policy, name='privacy_policy'),
-
+    path('invia_email/', views.invia_email, name="invia_email"),
 ]
