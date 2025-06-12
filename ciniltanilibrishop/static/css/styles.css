@@ -368,25 +368,6 @@ margin-left: 20px;
   color: #444;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 0.3rem;
-  font-weight: bold;
-}
-
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-.form-group input:focus,
-.form-group textarea:focus {
-  border-color: #2061A2;
-}
-
 center h4, h1{
   color:#2061A2;
 }
