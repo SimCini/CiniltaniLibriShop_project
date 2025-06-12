@@ -25,9 +25,9 @@
             </div>
 
             <ul class="nav-menu">
-                <li><a href="#" id="link-ordini" class="menu-link" onclick="caricaContenuto('ordini', this)"><i>📋</i> I Miei Ordini</a></li>
-                <li><a href="#" class="menu-link" onclick="caricaContenuto('indirizzi', this)"><i>🏠</i> Indirizzi</a></li>
-                <li><a href="#" class="menu-link" onclick="caricaContenuto('dati', this)"><i>👤</i> Dati Personali</a></li>
+                <li><a href="#" id="link-dati"class="menu-link" onclick="caricaContenuto('dati', this)"><i>👤</i> Dati Personali</a></li>
+                <li><a href="#" id="link-indirizzi" class="menu-link" onclick="caricaContenuto('indirizzi', this)"><i>🏠</i> Indirizzi</a></li>
+                <li><a href="#" id="link-ordini" class="menu-link" onclick="caricaContenuto('ordini', this)"><i>📋</i> I Miei Ordini</a></li> 
                 <li><a href="{% url 'ecommerce:logout' %}"><i>📤</i> Logout</a></li>
             </ul>
         </div>
@@ -312,9 +312,9 @@ function mostraFormModifica() {
 
 // Quando la pagina è pronta, seleziona la sezione "ordini" di default
 document.addEventListener('DOMContentLoaded', function () {
-    const defaultLink = document.getElementById('link-ordini');
+    const defaultLink = document.getElementById('link-dati');
     if (defaultLink) {
-        caricaContenuto('ordini', defaultLink);
+        caricaContenuto('dati', defaultLink);
     }
 });
 </script>
