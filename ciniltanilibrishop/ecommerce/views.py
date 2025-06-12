@@ -15,6 +15,7 @@ from django.db.models import Sum
 from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.contrib.auth.hashers import make_password
 
 def homepage(request):
     prodotti = list(Prodotto.objects.all())
@@ -358,3 +359,30 @@ def invia_email(request):
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+        
+@login_required
+def modifica_dati_utente(request):
+    utente = request.user
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        cognome = request.POST.get('cognome')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        conferma_password = request.POST.get('conferma_password')
+
+        # Validazione campi base
+        if password and password != conferma_password:
+            messages.error(request, "Le password non coincidono.")
+        else:
+            utente.first_name = nome
+            utente.last_name = cognome
+            utente.email = email
+
+            if password:
+                utente.password = make_password(password)
+
+            utente.save()
+            messages.success(request, "Dati aggiornati con successo.")
+            return redirect('area_personale')  # o la vista che carica l'area utente
+
+    return render(request, 'account/modifica_dati.html', {'utente': utente})

@@ -247,33 +247,69 @@ function caricaContenuto(sezione, elemento) {
             break;
 
         case 'dati':
-    contenuto = `
-        <div class="content-header">
-            <h2 class="content-title">I Miei Dati</h2>
-        </div>
-        <div class="personal-data-view">
-            <div class="data-item">
-                <label><strong>Nome:</strong></label>
-                <p>{{ utente.nome }}</p>
-            </div>
-            <div class="data-item">
-                <label><strong>Cognome:</strong></label>
-                <p>{{ utente.cognome }}</p>
-            </div>
-            <div class="data-item">
-                <label><strong>Email:</strong></label>
-                <p>{{ utente.email }}</p>
-            </div>
-            <button type="button" class="btn btn-secondary mt-3" style="background-color:#2061A2;">Modifica Dati</button>
-        </div>
-    `;
-    break;
+            contenuto = `
+                <div class="content-header">
+                    <h2 class="content-title">I Miei Dati</h2>
+                </div>
+                <div class="personal-data-view" id="dati-view">
+                    <div class="data-item">
+                        <label><strong>Nome:</strong></label>
+                        <p>{{ utente.nome }}</p>
+                    </div>
+                    <div class="data-item">
+                        <label><strong>Cognome:</strong></label>
+                        <p>{{ utente.cognome }}</p>
+                    </div>
+                    <div class="data-item">
+                        <label><strong>Email:</strong></label>
+                        <p>{{ utente.email }}</p>
+                    </div>
+                    <button type="button" class="btn btn-secondary mt-3" style="background-color:#2061A2;" onclick="mostraFormModifica()">Modifica Dati</button>
+                </div>
+
+                <div class="personal-data-edit" id="dati-form" style="display: none; margin-top: 2rem;">
+                    <form id="modifica-dati-form" method="post" action="/account/modifica/" style="max-width: 500px;">
+                        {% csrf_token %}
+                        <div class="data-item" style="margin-bottom: 1rem;">
+                            <label for="nome" style="display:block; margin-bottom:0.3rem;"><strong>Nome:</strong></label>
+                            <input type="text" id="nome" name="nome" value="{{ utente.nome }}" required style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px;">
+                        </div>
+                        <div class="data-item" style="margin-bottom: 1rem;">
+                            <label for="cognome" style="display:block; margin-bottom:0.3rem;"><strong>Cognome:</strong></label>
+                            <input type="text" id="cognome" name="cognome" value="{{ utente.cognome }}" required style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px;">
+                        </div>
+                        <div class="data-item" style="margin-bottom: 1rem;">
+                            <label for="email" style="display:block; margin-bottom:0.3rem;"><strong>Email:</strong></label>
+                            <input type="email" id="email" name="email" value="{{ utente.email }}" required style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px;">
+                        </div>
+                        <div class="data-item" style="margin-bottom: 1rem;">
+                            <label for="password" style="display:block; margin-bottom:0.3rem;"><strong>Nuova Password:</strong></label>
+                            <input type="password" id="password" name="password" placeholder="Inserisci nuova password" style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px;">
+                        </div>
+                        <div class="data-item" style="margin-bottom: 1rem;">
+                            <label for="conferma_password" style="display:block; margin-bottom:0.3rem;"><strong>Conferma Nuova Password:</strong></label>
+                            <input type="password" id="conferma_password" name="conferma_password" placeholder="Conferma nuova password" style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px;">
+                        </div>
+                        <button type="submit" style="background-color:#2061A2; color:white; padding: 0.6rem 1.2rem; border:none; border-radius:4px; cursor:pointer;">Salva Modifiche</button>
+                    </form>
+                </div>
+            `;
+            break;
         default:
             contenuto = `<p>Sezione non trovata.</p>`;
     }
 
     contentArea.innerHTML = contenuto;
 }
+
+function mostraFormModifica() {
+    const conferma = window.confirm("Sei sicuro di voler modificare i tuoi dati?");
+    if (conferma) {
+        document.getElementById('dati-view').style.display = 'none';
+        document.getElementById('dati-form').style.display = 'block';
+    }
+}
+
 // Quando la pagina è pronta, seleziona la sezione "ordini" di default
 document.addEventListener('DOMContentLoaded', function () {
     const defaultLink = document.getElementById('link-ordini');
