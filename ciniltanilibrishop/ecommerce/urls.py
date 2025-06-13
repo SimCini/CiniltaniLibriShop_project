@@ -26,5 +26,6 @@ urlpatterns = [
     path('privacy_policy/', views.privacy_policy, name='privacy_policy'),
     path('invia_email/', views.invia_email, name="invia_email"),
     path('profilo/modifica/', views.modifica_dati_utente, name='modifica_dati_utente'),
+    path('aggiungi_indirizzo', views.aggiungi_indirizzo, name='aggiungi_indirizzo'),
 
 ]

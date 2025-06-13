@@ -128,7 +128,11 @@
           <div class="text-center mx-1" style="width: 200px;">
             <a href="{% url 'ecommerce:dettaglio_prodotto' prodotto.id %}" style="text-decoration: none; color: inherit;">
               <div class="img-box" style="width: 100%; height: 200px; overflow: hidden; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                <img src="{{ prodotto.foto.url }}" alt="{{ prodotto.nome }}" style="width: 100%; height: 100%; object-fit: contain;">
+                {% if prodotto.foto %}
+                  <img src="{{ prodotto.foto.url }}" alt="{{ prodotto.nome }}" style="width: 100%; height: 100%; object-fit: contain;">
+                {% else %}
+                  <img src="{% static 'assets/image-not-found.png' %}" alt="Immagine non disponibile" style="width: 100%; height: 100%; object-fit: contain;">
+                {% endif %}
               </div>
               <p class="mt-2 fw-semibold" style="font-size: 0.95rem;">{{ prodotto.nome }}</p>
             </a>

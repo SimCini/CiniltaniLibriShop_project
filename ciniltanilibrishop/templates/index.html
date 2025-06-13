@@ -16,13 +16,26 @@
         <style>
             .cart-count {
                 position: absolute;
-                top: 0;
-                right: 0;
-                background-color:rgb(20, 111, 202);
+                top: -4px;
+                right: -8px;
+                background-color: rgb(20, 111, 202);
                 color: white;
-                font-size: 12px;
+                font-size: 11px;
+                font-weight: bold;
                 border-radius: 50%;
-                padding: 2px 6px;
+                padding: 2px 5px;
+                min-width: 18px;
+                height: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            }
+            
+            .icons a {
+                position: relative;
+                display: inline-block;
             }
         </style>
     </head>
@@ -72,6 +85,8 @@
             </div> 
             <div style="padding-left: 10px;" class="hamburger" onclick="toggleSidebar()">&#9776;</div>
         </div> 
+        
+        
         <div id="sidebar" class="sidebar">
             <form class="form-inline" method="get" action="{% url 'ecommerce:risultati_ricerca' %}">
                 <input class="form-control mr-sm-2" type="search" name="q" placeholder="Cerca..." aria-label="Cerca" id="cerca">
@@ -90,6 +105,38 @@
             function toggleSidebar() {
               document.getElementById("sidebar").classList.toggle("open");
             }
+            
+            // Mantieni il counter sempre visibile durante la navigazione
+            document.addEventListener('DOMContentLoaded', function() {
+                // Salva il count nel localStorage quando cambia
+                const cartCount = document.getElementById('cart-count');
+                if (cartCount) {
+                    localStorage.setItem('cart_count', cartCount.textContent);
+                    // Assicurati che rimanga visibile
+                    cartCount.style.display = 'flex';
+                }
+                
+                // Se non c'è il counter ma c'è un valore salvato, ricrealo
+                const savedCount = localStorage.getItem('cart_count');
+                if (savedCount && savedCount !== '0' && !cartCount) {
+                    const cartIcon = document.querySelector('.fas.fa-shopping-cart').parentElement;
+                    if (cartIcon && cartIcon.style.position === 'relative') {
+                        const newCounter = document.createElement('span');
+                        newCounter.className = 'cart-count';
+                        newCounter.id = 'cart-count';
+                        newCounter.textContent = savedCount;
+                        cartIcon.appendChild(newCounter);
+                    }
+                }
+            });
+            
+            // Pulisci il localStorage quando il carrello è vuoto
+            window.addEventListener('beforeunload', function() {
+                const cartCount = document.getElementById('cart-count');
+                if (!cartCount || cartCount.textContent === '0') {
+                    localStorage.removeItem('cart_count');
+                }
+            });
         </script>
         <!-- Footer-->
         <footer class="py-5 bg-dark">

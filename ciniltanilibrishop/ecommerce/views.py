@@ -16,6 +16,7 @@ from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.contrib.auth.hashers import make_password
+from django.views.decorators.http import require_http_methods
 
 def homepage(request):
     prodotti = list(Prodotto.objects.all())
@@ -386,3 +387,20 @@ def modifica_dati_utente(request):
             return redirect('area_personale')  # o la vista che carica l'area utente
 
     return render(request, 'account/modifica_dati.html', {'utente': utente})
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def aggiungi_indirizzo(request):
+    user = request.user
+
+    if request.method == 'POST':
+        user.telefono = request.POST.get('telefono', '').strip()
+        user.indirizzo = request.POST.get('indirizzo', '').strip()
+        user.citta = request.POST.get('citta', '').strip()
+        user.cap = request.POST.get('cap', '').strip()
+        user.provincia = request.POST.get('provincia', '').strip()
+        user.paese = request.POST.get('paese', '').strip()
+        user.save()
+        return redirect('ecommerce:profilo_utente')
+
+    return render(request, 'aggiungi_indirizzo.html', {'user': user})
