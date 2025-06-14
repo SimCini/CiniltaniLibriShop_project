@@ -105,38 +105,6 @@
             function toggleSidebar() {
               document.getElementById("sidebar").classList.toggle("open");
             }
-            
-            // Mantieni il counter sempre visibile durante la navigazione
-            document.addEventListener('DOMContentLoaded', function() {
-                // Salva il count nel localStorage quando cambia
-                const cartCount = document.getElementById('cart-count');
-                if (cartCount) {
-                    localStorage.setItem('cart_count', cartCount.textContent);
-                    // Assicurati che rimanga visibile
-                    cartCount.style.display = 'flex';
-                }
-                
-                // Se non c'è il counter ma c'è un valore salvato, ricrealo
-                const savedCount = localStorage.getItem('cart_count');
-                if (savedCount && savedCount !== '0' && !cartCount) {
-                    const cartIcon = document.querySelector('.fas.fa-shopping-cart').parentElement;
-                    if (cartIcon && cartIcon.style.position === 'relative') {
-                        const newCounter = document.createElement('span');
-                        newCounter.className = 'cart-count';
-                        newCounter.id = 'cart-count';
-                        newCounter.textContent = savedCount;
-                        cartIcon.appendChild(newCounter);
-                    }
-                }
-            });
-            
-            // Pulisci il localStorage quando il carrello è vuoto
-            window.addEventListener('beforeunload', function() {
-                const cartCount = document.getElementById('cart-count');
-                if (!cartCount || cartCount.textContent === '0') {
-                    localStorage.removeItem('cart_count');
-                }
-            });
         </script>
         <!-- Footer-->
         <footer class="py-5 bg-dark">

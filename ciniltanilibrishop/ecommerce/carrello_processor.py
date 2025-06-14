@@ -3,7 +3,10 @@ from django.db.models import Sum
 
 def carrello_item_count(request):
     if request.user.is_authenticated:
-        item_count = Carrello.objects.filter(utente=request.user).aggregate(
+        item_count = Carrello.objects.filter(
+            utente=request.user,
+            quantita__gt=0
+        ).aggregate(
             total=Sum('quantita')
         )['total'] or 0
     else:
