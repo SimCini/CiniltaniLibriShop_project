@@ -32,7 +32,7 @@ class Prodotto(models.Model):
     categoria = models.CharField(max_length=20, choices=CATEGORIE)
 
     prezzo = models.DecimalField(max_digits=10, decimal_places=2)
-    prezzo_scontato = models.DecimalField(max_digits=10, decimal_places=2)
+    prezzo_scontato = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     
     foto = models.ImageField(upload_to="prodotti/")
     

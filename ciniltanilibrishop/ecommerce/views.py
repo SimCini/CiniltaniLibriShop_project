@@ -89,6 +89,9 @@ def contatti(request):
 def privacy_policy(request):
     return render(request, 'privacy_policy.html')
 
+def novita(request):
+    return render(request, "novita.html")
+
 @login_required
 def visualizza_profilo(request):
     utente = request.user # L'oggetto Utente dell'utente loggato

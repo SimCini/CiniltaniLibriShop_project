@@ -18,11 +18,11 @@
                 
                 <div class="product-price">
                     {% if prodotto.prezzo_scontato and prodotto.prezzo_scontato < prodotto.prezzo %}
-                        <span>{{prodotto.prezzo_scontato}}</span>
+                        <span>€ {{prodotto.prezzo_scontato}}</span>
                         <span class="old-price">{{prodotto.prezzo}}</span>
                         <span class="discount-badge">-{{ prodotto.sconto }}%</span>
                     {% else %}
-                        <span class="old-price">{{prodotto.prezzo}}</span>
+                        <span>€ {{prodotto.prezzo}}</span>
                     {% endif %}
                 </div>
     

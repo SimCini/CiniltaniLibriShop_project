@@ -85,9 +85,22 @@
 </div>
 
 <div class="container my-5">
-  <h2 class="text-center mb-4">Novità</h2>
-  <div class="img-box">
-    <img src="https://www.ciniltanilibrishop.it/wp-content/uploads/2025/04/Coprimessali-promozione-pasquale-400x400.png" alt="Libro 1">
+  <h2 class="text-center mb-5">Novità</h2>
+  <div class="row align-items-center">
+    <div class="col-md-5">
+      <div class="img-box" style="border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <img src="https://www.ciniltanilibrishop.it/wp-content/uploads/2025/04/Coprimessali-promozione-pasquale-400x400.png" alt="Coprimessali Promozione Pasquale" class="img-fluid">
+      </div>
+    </div>
+    <div class="col-md-7 mt-4 mt-md-0">
+      <h4 class="fw">Coprimessali in Promozione Pasquale</h4>
+      <p class="lead" style="font-size: 1.1rem;">
+        Scopri la nostra selezione speciale di coprimessali in offerta per il periodo pasquale. Realizzati con materiali di alta qualità, ideali per arricchire la liturgia con eleganza e sobrietà. Approfitta delle promozioni!
+      </p>
+      <a href="{% url 'ecommerce:novita' %}" class="btn btn-primary btn-lg mt-2 scopri-piu-btn">
+        Scopri di più
+      </a>
+    </div>
   </div>
 </div>
 
@@ -174,6 +187,11 @@
   .carousel-item.active .img-box img:hover {
     transform: scale(1.05);
     cursor: pointer;
+  }
+
+  .scopri-piu-btn:hover {
+    background-color: #3E3380; 
+    border-color: #3E3380;
   }
 </style>
 
