@@ -210,16 +210,15 @@ function caricaContenuto(sezione, elemento) {
                     <table class="orders-table">
                         <thead>
                         <tr>
-                            <th>#</th>
+                            <th>N</th>
                             <th>Data</th>
                             <th>Stato</th>
                             <th>Totale</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {% for ordine in ordini %}
-                            <tr>
-                            <td>#{{ ordine.id }}</td>
+                        {% for ordine in ordini %}                            <tr>
+                            <td>#{{ ordine.numero_ordine}}</td>
                             <td>{{ ordine.data_ordine|date:"d/m/Y" }}</td>
                             <td>
                                 <span class="status-badge status-{{ ordine.stato|lower }}">
@@ -231,11 +230,11 @@ function caricaContenuto(sezione, elemento) {
                         {% endfor %}
                         </tbody>
                     </table>
-                    {% else %}
+                {% else %}
                     <p style="padding: 1rem; font-style: italic; color: #666;">
                         Nessun ordine effettuato.
                     </p>
-                    {% endif %}
+                {% endif %}
             `;
             break;
 
