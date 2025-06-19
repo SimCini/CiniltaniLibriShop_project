@@ -23,6 +23,22 @@ class ElementoOrdineInline(admin.TabularInline):
 class UtenteAdmin(UserAdmin):
     model = Utente
     list_display = ['username', 'email', 'ruolo', 'is_staff', 'is_active']
+    list_filter = ('ruolo', 'is_staff', 'is_active')
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Informazioni personali', {'fields': ('nome', 'cognome', 'email', 'telefono', 'indirizzo', 'citta', 'cap', 'provincia', 'paese')}),
+        ('Ruoli', {'fields': ('ruolo',)}),
+        ('Permessi', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Date importanti', {'fields': ('last_login', 'date_joined', 'data_registrazione')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2', 'ruolo', 'is_staff', 'is_active')}
+        ),
+    )
+    search_fields = ('username', 'email')
+    ordering = ('username',)
 
 @admin.register(Ordine)
 class OrdineAdmin(admin.ModelAdmin):

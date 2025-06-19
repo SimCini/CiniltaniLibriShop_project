@@ -389,7 +389,7 @@ def modifica_dati_utente(request):
             messages.success(request, "Dati aggiornati con successo.")
             return redirect('area_personale')  # o la vista che carica l'area utente
 
-    return render(request, 'account/modifica_dati.html', {'utente': utente})
+    return render(request, 'profilo.html', {'utente': utente})
 
 @login_required
 @require_http_methods(["GET", "POST"])
