@@ -237,7 +237,7 @@ def checkout(request):
         ordine = Ordine.crea_con_elementi(
             utente=utente,
             prodotti_quantita=prodotti_quantita,
-            stato='completed',
+            stato='on-hold',
         )
         ordine.data_pagamento = timezone.now()
         ordine.save()
@@ -387,7 +387,7 @@ def modifica_dati_utente(request):
 
             utente.save()
             messages.success(request, "Dati aggiornati con successo.")
-            return redirect('area_personale')  # o la vista che carica l'area utente
+            return redirect('ecommerce:profilo_utente')  # o la vista che carica l'area utente
 
     return render(request, 'profilo.html', {'utente': utente})
 

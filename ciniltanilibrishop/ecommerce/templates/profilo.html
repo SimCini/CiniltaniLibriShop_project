@@ -316,7 +316,7 @@ function caricaContenuto(sezione, elemento) {
                 <!-- FORM MODIFICA DATI PERSONALI -->
                 <div class="personal-data-edit" id="dati-form" style="display: none; margin-top: 2rem;">
                     <h3 class="section-title">✏️ Modifica Dati Personali</h3>
-                    <form id="modifica-dati-form" method="post" action="profilo/modifica/" style="max-width: 500px;">
+                    <form id="modifica-dati-form" method="post" action="{% url 'ecommerce:modifica_dati_utente' %}" style="max-width: 500px;">
                         {% csrf_token %}
                         <div class="data-item" style="margin-bottom: 1rem;">
                             <label for="nome" style="display:block; margin-bottom:0.3rem;"><strong>Nome: *</strong></label>
