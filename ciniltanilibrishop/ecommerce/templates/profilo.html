@@ -18,10 +18,20 @@
                         {{ utente.ruolo }}
                     </button>
                 {% elif utente.ruolo == 'amministratore' %}
-                    <a href="{% url 'admin:index' %}" class="btn ruolo-btn btn-rosso">
+                    <!--<a href="{% url 'admin:index' %}" class="btn ruolo-btn btn-rosso">
+                        {{ utente.ruolo }}
+                    </a>-->
+                    <a href="{% url 'ecommerce:amministrazione' %}" class="btn ruolo-btn btn-rosso">
                         {{ utente.ruolo }}
                     </a>
+                    <br>
+                    <div>
+                        <ul class="nav-menu">
+                            <li style="border: 1px solid #2061A2;border-radius: 0.25rem; background-color:rgb(164, 192, 219);"><a href="{% url 'ecommerce:amministrazione' %}" class="menu-link">⏩ Pannello Admin</a></li>
+                        </ul>
+                    </div>
                 {% endif %}
+                
             </div>
 
             <ul class="nav-menu">

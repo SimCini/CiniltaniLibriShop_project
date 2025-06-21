@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from .models import Prodotto, Utente, Ordine, Carrello
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
@@ -17,6 +17,9 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.contrib.auth.hashers import make_password
 from django.views.decorators.http import require_http_methods
+from datetime import datetime
+from django.db.models import Sum
+from django.contrib.admin.views.decorators import staff_member_required
 
 def homepage(request):
     prodotti = list(Prodotto.objects.all())
@@ -407,3 +410,43 @@ def aggiungi_indirizzo(request):
         return redirect('ecommerce:profilo_utente')
 
     return render(request, 'aggiungi_indirizzo.html', {'user': user})
+
+@staff_member_required
+def amministrazione(request):
+    oggi = datetime.today()
+    ordini = Ordine.objects.all()
+    ordini_in_attesa = Ordine.objects.filter(stato='in_attesa')
+
+    # Ricavo del mese corrente
+    ordini_mensili = Ordine.objects.filter(
+        data_ordine__year=oggi.year,
+        data_ordine__month=oggi.month
+    )
+    ricavo_mensile = ordini_mensili.aggregate(totale=Sum('totale'))['totale'] or 0
+
+    context = {
+        'ordini': ordini,
+        'ordini_in_attesa': ordini_in_attesa,
+        'ricavo_mensile': ricavo_mensile,
+    }
+
+    return render(request, 'amministrazione.html', context)
+
+@require_http_methods(["GET", "POST"])
+def aggiorna_stato_ordine(request, ordine_id):
+    try:
+        data = json.loads(request.body)
+        nuovo_stato = data.get('nuovo_stato')
+
+        ordine = Ordine.objects.get(id=ordine_id)
+        if nuovo_stato not in dict(Ordine.STATUS_CHOICES):
+            return HttpResponseBadRequest("Stato non valido")
+
+        ordine.stato = nuovo_stato
+        ordine.save(update_fields=['stato'])
+
+        return JsonResponse({'success': True})
+    except Ordine.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Ordine non trovato'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)

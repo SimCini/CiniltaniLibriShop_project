@@ -1,0 +1,1738 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}CiniltaniLibriShop - Gestione Ordini{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Variabili CSS */
+:root {
+  --primary-purple: #3E3380;
+  --primary-blue: #2061A2;
+  --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
+  --gradient-hover: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-blue) 100%);
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --info-color: #17a2b8;
+  --light-bg: #f8f9fa;
+  --white: #ffffff;
+  --shadow-light: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-medium: 0 4px 20px rgba(0,0,0,0.12);
+  --shadow-heavy: 0 8px 32px rgba(0,0,0,0.16);
+  --border-radius: 12px;
+  --border-radius-large: 16px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Styles */
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.back-link {
+      color: #555;
+      padding: 10px;
+      text-decoration: none;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
+      transition: color 0.3s, transform 0.2s;
+}
+
+.back-link:hover {
+      color: #000;
+      transform: translateX(-2px);
+}
+
+/* Hero Section Admin - Ridotta */
+.admin-hero {
+  background: var(--gradient-primary);
+  height: 200px;
+  border-radius: 0 0 30px 30px;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-heavy);
+}
+
+.admin-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1.5" fill="rgba(255,255,255,0.15)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.8" fill="rgba(255,255,255,0.08)"/><circle cx="10" cy="60" r="1.2" fill="rgba(255,255,255,0.12)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.4;
+}
+
+.hero-content {
+  padding: 2rem 2rem;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.admin-title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+  letter-spacing: -0.02em;
+}
+
+.admin-subtitle {
+  font-size: 1.2rem;
+  font-weight: 400;
+  opacity: 0.9;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+  margin-bottom: 0;
+}
+
+/* Cards Enhancement - Altezze uguali */
+.filters-card, .stats-card {
+  background: var(--white);
+  border-radius: var(--border-radius-large);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-light);
+  border: 1px solid rgba(62, 51, 128, 0.08);
+  transition: var(--transition);
+  backdrop-filter: blur(10px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.filters-card:hover, .stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+  border-color: rgba(62, 51, 128, 0.15);
+}
+
+.card-title {
+  color: var(--primary-purple);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-title i {
+  color: var(--primary-blue);
+}
+
+/* Stats Grid Enhancement - Più compatto */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem 0.5rem;
+  background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 50%, #f0f4ff 100%);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(32, 97, 162, 0.1);
+}
+
+.stat-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-primary);
+}
+
+.stat-item:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-light);
+  background: linear-gradient(135deg, #e8f2ff 0%, #f0f4ff 50%, #f8f9ff 100%);
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.2rem;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+/* Form Controls Enhancement - Allineamento perfetto */
+.form-control, .form-select {
+  border: 2px solid #e9ecef;
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  background: var(--white);
+  height: 50px; /* Altezza fissa per allineamento */
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(32, 97, 162, 0.15);
+  background: var(--white);
+}
+
+.form-control:hover, .form-select:hover {
+  border-color: rgba(32, 97, 162, 0.3);
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+/* Button Enhancements - Altezza allineata */
+.btn-filter {
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  border-radius: 50px;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  height: 50px; /* Stessa altezza degli input */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-filter::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-filter:hover::before {
+  left: 100%;
+}
+
+.btn-filter:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(32, 97, 162, 0.4);
+  background: var(--gradient-hover);
+  color: white;
+}
+
+.btn-filter:active {
+  transform: translateY(0);
+}
+
+/* Table Container Enhancement - Ottimizzato per viewport */
+.orders-table-container {
+  background: var(--white);
+  border-radius: var(--border-radius-large);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-light);
+  margin-bottom: 2rem;
+  border: 1px solid rgba(62, 51, 128, 0.08);
+  max-height: calc(100vh - 420px); /* Altezza massima per contenere tutto */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f8f9fa;
+  flex-shrink: 0;
+}
+
+.table-title {
+  color: var(--primary-purple);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Table Enhancement - Scrollabile */
+.table-responsive {
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: calc(100vh - 500px);
+}
+
+.orders-table {
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.orders-table thead th {
+  border-bottom: 2px solid var(--primary-blue);
+  font-weight: 600;
+  color: var(--primary-purple);
+  padding: 1rem 0.75rem;
+  background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.orders-table thead th:first-child {
+  border-top-left-radius: var(--border-radius);
+}
+
+.orders-table thead th:last-child {
+  border-top-right-radius: var(--border-radius);
+}
+
+.order-row {
+  transition: var(--transition);
+  border-bottom: 1px solid #f0f2f5;
+  background: var(--white);
+}
+
+.order-row:hover {
+  background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 30%, #f0f4ff 70%, #f8f9ff 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
+}
+
+.order-row td {
+  padding: 1rem 0.75rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+/* Table Cell Styles - Più compatti */
+.order-id {
+  font-weight: 700;
+  color: var(--primary-blue);
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #e8f2ff, #f0f4ff);
+  padding: 0.3rem 0.6rem;
+  border-radius: 15px;
+  display: inline-block;
+}
+
+.customer-info {
+  line-height: 1.4;
+}
+
+.customer-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.1rem;
+  font-size: 0.9rem;
+}
+
+.customer-email {
+  color: #666;
+  font-style: italic;
+  font-size: 0.75rem;
+}
+
+.products-badge {
+  background: linear-gradient(45deg, #e8f2ff, #d1e9ff);
+  color: var(--primary-blue);
+  font-weight: 600;
+  border-radius: 20px;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgba(32, 97, 162, 0.2);
+  font-size: 0.75rem;
+}
+
+.order-total {
+  font-weight: 700;
+  color: var(--success-color);
+  font-size: 1.1rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.order-date {
+  color: #555;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* Status Select Enhancement */
+.status-select {
+  border: 2px solid transparent;
+  background: transparent;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 600;
+  transition: var(--transition);
+  cursor: pointer;
+  min-width: 110px;
+}
+
+.status-on-hold { 
+  background: linear-gradient(135deg, #fff8e1, #fff3c4);
+  color: #f57c00; 
+  border-color: #ffb300;
+}
+
+.status-completed { 
+  background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+  color: #2e7d32; 
+  border-color: #4caf50;
+}
+
+.status-cancelled { 
+  background: linear-gradient(135deg, #ffebee, #ffcdd2);
+  color: #c62828; 
+  border-color: #f44336;
+}
+
+.status-refunded { 
+  background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+  color: #7b1fa2; 
+  border-color: #9c27b0;
+}
+
+.status-select:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-light);
+}
+
+/* Action Buttons Enhancement */
+.btn-group {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.btn-view, .btn-print, .btn-delete {
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.btn-view {
+  background: var(--primary-blue);
+  color: white;
+  margin-top: 10px;
+}
+
+.btn-print {
+  background: linear-gradient(45deg, #ff9800, #ffb74d);
+  color: white;
+}
+
+.btn-delete {
+  background: linear-gradient(45deg, #f44336, #ef5350);
+  color: white;
+}
+
+.btn-view:hover, .btn-print:hover, .btn-delete:hover {
+  transform: scale(1.1) rotate(5deg);
+  color: white;
+}
+
+.btn-view:hover {
+  box-shadow: 0 4px 15px var(--primary-purple);
+  background-color: var(--primary-purple);
+  color:white;
+}
+
+.btn-print:hover {
+  box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+}
+
+.btn-delete:hover {
+  box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #666;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: #ddd;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Pagination Enhancement - Compatta */
+.pagination {
+  margin-top: 1rem;
+  flex-shrink: 0;
+}
+
+.page-link {
+  color: var(--primary-blue);
+  border: 1px solid #dee2e6;
+  border-radius: var(--border-radius);
+  margin: 0 0.1rem;
+  padding: 0.5rem 0.8rem;
+  transition: var(--transition);
+  font-size: 0.85rem;
+}
+
+.page-link:hover {
+  background: var(--gradient-primary);
+  color: white;
+  border-color: var(--primary-blue);
+  transform: translateY(-1px);
+}
+
+.page-item.active .page-link {
+  background: var(--gradient-primary);
+  border-color: var(--primary-blue);
+  color: white;
+}
+
+/* Modal Enhancement */
+.modal-content {
+  border-radius: var(--border-radius-large);
+  border: none;
+  box-shadow: var(--shadow-heavy);
+  overflow: hidden;
+}
+
+.modal-header {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 1.5rem 2rem;
+  border-bottom: none;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.modal-footer {
+  padding: 1rem 2rem;
+  border-top: 1px solid #f0f2f5;
+  background: #f8f9fa;
+}
+
+/* Toast Enhancement */
+.toast {
+  border-radius: var(--border-radius);
+  border: none;
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: blur(10px);
+}
+
+.toast.bg-success {
+  background: linear-gradient(135deg, var(--success-color), #32cd32) !important;
+}
+
+.toast.bg-danger {
+  background: linear-gradient(135deg, var(--danger-color), #ff6b6b) !important;
+}
+
+/* Info Card */
+.info-card {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--primary-blue);
+  margin: 1rem 0;
+}
+
+/* Spazi ottimizzati */
+.container {
+  max-width: 100%;
+  padding: 0 1rem;
+}
+
+/* Row con margini ridotti */
+.row.mb-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-title {
+    font-size: 2rem;
+  }
+  
+  .admin-subtitle {
+    font-size: 1rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+  
+  .filters-card, .stats-card {
+    margin-bottom: 1rem;
+    height: auto;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  
+  .orders-table-container {
+    padding: 1rem;
+    overflow-x: auto;
+    max-height: calc(100vh - 350px);
+  }
+  
+  .orders-table {
+    min-width: 700px;
+  }
+
+  .table-responsive {
+    max-height: calc(100vh - 400px);
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-content {
+    padding: 1.5rem 1rem;
+  }
+  
+  .admin-title {
+    font-size: 1.8rem;
+  }
+  
+  .container {
+    padding: 0 0.5rem;
+  }
+}
+
+/* Loading States */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+  position: relative;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px;
+  border: 2px solid var(--primary-blue);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-primary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gradient-hover);
+}
+
+/* Assicura che tutto rientri nella viewport */
+html, body {
+  height: 100vh;
+  overflow-x: hidden;
+}
+
+.main-content {
+  height: calc(100vh - 60px); /* Sottrae l'altezza del possibile header/navbar */
+  display: flex;
+  flex-direction: column;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<body>
+
+<!-- Hero Section per Admin -->
+<div class="admin-hero d-flex justify-content-center align-items-center text-white">
+  <div class="hero-content">    
+    <h1 class="admin-title">Gestione Ordini</h1>
+    <p class="admin-subtitle">Pannello Amministratore</p>
+  </div>
+</div>
+<a href="javascript:history.back()" class="back-link">
+    ← Torna indietro
+</a>
+
+<!-- Filtri e Statistiche -->
+<section class="container mt-4">
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <div class="filters-card">
+        <h5 class="card-title">
+          <i class="fas fa-filter"></i>
+          Filtri Ordini
+        </h5>
+        <form class="row g-3" method="get" action="" id="filterForm">
+          <div class="col-md-6">
+            <label class="form-label">Cerca</label>
+            <input type="text" class="form-control" name="codice_ordine" id="orderCode" 
+                  placeholder="Inserisci cliente o codice ordine..." 
+                  value="{{ request.GET.codice_ordine|default:'' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Stato Ordine</label>
+            <select class="form-select" name="stato" id="statusFilter">
+              <option value="">Tutti gli stati</option>
+              <option value="on-hold" {% if request.GET.stato == 'on-hold' %}selected{% endif %}>In attesa</option>
+              <option value="completed" {% if request.GET.stato == 'completed' %}selected{% endif %}>Completato</option>
+              <option value="cancelled" {% if request.GET.stato == 'cancelled' %}selected{% endif %}>Cancellato</option>
+              <option value="refunded" {% if request.GET.stato == 'refunded' %}selected{% endif %}>Rimborsato</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Data Inizio</label>
+            <input type="date" class="form-control" name="date_from" id="dateFrom"
+                  value="{{ request.GET.date_from|default:'' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Data Fine</label>
+            <input type="date" class="form-control" name="date_to" id="dateTo"
+                  value="{{ request.GET.date_to|default:'' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">&nbsp;</label>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-filter">
+                <i class="fas fa-search me-2"></i>Filtra
+              </button>
+            </div>
+          </div>
+          {% if request.GET.codice_ordine or request.GET.stato or request.GET.date_from or request.GET.date_to %}
+          <div class="col-12">
+            <a href="?" class="btn btn-outline-secondary btn-sm">
+              <i class="fas fa-times me-1"></i>Rimuovi Filtri
+            </a>
+          </div>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="stats-card">
+        <h5 class="card-title">
+          <i class="fas fa-chart-bar"></i>
+          Statistiche Rapide
+        </h5>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-number">{{ ordini.count }}</span>
+            <span class="stat-label">Ordini Totali</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ ordini_in_attesa.count|default:0 }}</span>
+            <span class="stat-label">In Attesa</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">€{{ ricavi_mensili|floatformat:0|default:0 }}</span>
+            <span class="stat-label">Ricavo Mensile</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tabella Ordini -->
+<section class="container">
+  <div class="orders-table-container">
+    <div class="table-header">
+      <h4 class="table-title">
+        <i class="fas fa-list-ul"></i>
+        Lista Ordini
+        {% if request.GET.stato or request.GET.date_from or request.GET.date_to %}
+          <small class="text-muted ms-2">(Filtrata)</small>
+        {% endif %}
+      </h4>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table orders-table">
+        <thead>
+          <tr>
+            <th><i class="fas fa-hashtag me-1"></i>ID</th>
+            <th><i class="fas fa-user me-1"></i>Cliente</th>
+            <th><i class="fas fa-calendar me-1"></i>Data</th>
+            <th><i class="fas fa-shopping-bag me-1"></i>Prodotti</th>
+            <th><i class="fas fa-euro-sign me-1"></i>Totale</th>
+            <th><i class="fas fa-info-circle me-1"></i>Stato</th>
+            <th><i class="fas fa-cogs me-1"></i>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ordine in ordini %}
+          <tr class="order-row" data-order-id="{{ ordine.id }}">
+            <td>
+              <span class="order-id">#{{ ordine.numero_ordine|stringformat:"05d" }}</span>
+            </td>
+            <td class="customer-info">
+              <div class="customer-name">
+                {% if ordine.utente.first_name %}
+                  {{ ordine.utente.first_name }} {{ ordine.utente.last_name }}
+                {% else %}
+                  {{ ordine.utente.username }}
+                {% endif %}
+              </div>
+              <div class="customer-email">{{ ordine.utente.email }}</div>
+            </td>
+            <td class="order-date">
+              {{ ordine.data_ordine|date:"d/m/Y" }}<br>
+              <small class="text-muted">{{ ordine.data_ordine|date:"H:i" }}</small>
+            </td>
+            <td class="products-count">
+              <span class="badge products-badge">
+                {{ ordine.righe.count }} prodott{{ ordine.righe.count|pluralize:"o,i" }}
+              </span>
+            </td>
+            <td class="order-total">€{{ ordine.totale|floatformat:2 }}</td>
+            <td class="order-status">
+              <form method="post" class="status-form" data-order-id="{{ ordine.id }}">
+                {% csrf_token %}
+                <input type="hidden" name="order_id" value="{{ ordine.id }}">
+                <select class="form-select status-select status-{{ ordine.stato }}" 
+                        name="stato" onchange="updateOrderStatus(this)" data-url="{% url 'ecommerce:aggiorna_stato_ordine' ordine_id=ordine.id %}" class="status-{{ ordine.stato }}">
+                  <option value="on-hold" {% if ordine.stato == 'on-hold' %}selected{% endif %}>In attesa</option>
+                  <option value="completed" {% if ordine.stato == 'completed' %}selected{% endif %}>Completato</option>
+                  <option value="cancelled" {% if ordine.stato == 'cancelled' %}selected{% endif %}>Cancellato</option>
+                  <option value="refunded" {% if ordine.stato == 'refunded' %}selected{% endif %}>Rimborsato</option>
+                </select>
+              </form>
+            </td>
+            <td class="order-actions text-center">
+              <button class="btn btn-view d-inline-flex align-items-center justify-content-center mx-auto" onclick="viewOrderDetails({{ ordine.numero_ordine }})" title="Visualizza Dettagli">
+                <i class="fas fa-eye"></i>
+              </button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7">
+              <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>Nessun ordine trovato con i filtri selezionati.</p>
+                {% if request.GET.stato or request.GET.date_from or request.GET.date_to %}
+                <a href="?" class="btn btn-outline-primary">
+                  <i class="fas fa-refresh me-1"></i>Visualizza Tutti gli Ordini
+                </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginazione -->
+    {% if ordini.has_other_pages %}
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if ordini.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ ordini.previous_page_number }}{% if request.GET.stato %}&stato={{ request.GET.stato }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">
+            <i class="fas fa-chevron-left"></i> Precedente
+          </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">
+            <i class="fas fa-chevron-left"></i> Precedente
+          </span>
+        </li>
+        {% endif %}
+
+        {% for num in ordini.paginator.page_range %}
+          {% if ordini.number == num %}
+          <li class="page-item active">
+            <span class="page-link">{{ num }}</span>
+          </li>
+          {% elif num > ordini.number|add:'-3' and num < ordini.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ num }}{% if request.GET.stato %}&stato={{ request.GET.stato }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">{{ num }}</a>
+          </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if ordini.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ ordini.next_page_number }}{% if request.GET.stato %}&stato={{ request.GET.stato }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">
+            Successivo <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">
+            Successivo <i class="fas fa-chevron-right"></i>
+          </span>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Modal Dettagli Ordine -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="orderDetailsModalLabel">
+          <i class="fas fa-receipt me-2"></i>Dettagli Ordine #<span id="modalOrderId"></span>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+      </div>
+      <div class="modal-body" id="orderDetailsContent">
+        <div class="text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Caricamento...</span>
+          </div>
+          <p class="mt-2 text-muted">Caricamento dettagli ordine...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i>Chiudi
+        </button>
+        <button type="button" class="btn btn-primary" onclick="printOrderFromModal()">
+          <i class="fas fa-print me-1"></i>Stampa
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<form>
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</form>
+</body>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+// ===== SISTEMA DI FILTRAGGIO ORDINI =====
+
+// Variabili globali per la gestione dello stato
+let currentOrders = [];
+let filteredOrders = [];
+let originalStatistics = {}; // Statistiche originali che non cambiano
+let currentPage = 1;
+const ordersPerPage = 10;
+
+// Inizializzazione al caricamento della pagina
+document.addEventListener('DOMContentLoaded', function() {
+    initializeOrderFiltering();
+    setupEventListeners();
+    loadOrdersFromDOM();
+});
+
+// ===== INIZIALIZZAZIONE =====
+function initializeOrderFiltering() {
+    console.log('Sistema di filtraggio ordini inizializzato');
+    
+    // Imposta i valori dei filtri dalla URL (se presenti)
+    setFiltersFromURL();
+    
+    // Calcola e salva le statistiche originali
+    calculateOriginalStatistics();
+    
+    // Applica i filtri iniziali se presenti
+    if (hasActiveFilters()) {
+        applyFilters();
+    }
+}
+
+// ===== CARICAMENTO ORDINI DAL DOM =====
+function loadOrdersFromDOM() {
+    currentOrders = [];
+    const orderRows = document.querySelectorAll('.order-row[data-order-id]');
+    
+    orderRows.forEach(row => {
+        const orderId = row.getAttribute('data-order-id');
+        const orderNumberElement = row.querySelector('.order-id');
+        const customerNameElement = row.querySelector('.customer-name');
+        const customerEmailElement = row.querySelector('.customer-email');
+        const orderDateElement = row.querySelector('.order-date');
+        const productsCountElement = row.querySelector('.products-badge');
+        const totalElement = row.querySelector('.order-total');
+        const statusSelect = row.querySelector('.status-select');
+        
+        if (orderNumberElement && customerNameElement && orderDateElement) {
+            // Estrai il numero ordine dal testo (rimuovi # e zeri iniziali)
+            const numeroOrdine = parseInt(orderNumberElement.textContent.replace('#', '').replace(/^0+/, ''));
+            
+            // Estrai la data dall'elemento (prendi solo la prima riga, prima del <br>)
+            const dateText = orderDateElement.childNodes[0].textContent.trim();
+            const timeText = orderDateElement.querySelector('small') ? 
+                orderDateElement.querySelector('small').textContent : '00:00';
+            
+            // Converti la data italiana in formato ISO
+            const [day, month, year] = dateText.split('/');
+            const [hours, minutes] = timeText.split(':');
+            const dataOrdine = new Date(year, month - 1, day, hours, minutes).toISOString();
+            
+            // Estrai il totale (rimuovi € e converti)
+            const totale = parseFloat(totalElement.textContent.replace('€', '').replace(',', '.'));
+            
+            // Estrai il numero di prodotti
+            const numProdotti = parseInt(productsCountElement.textContent.match(/\d+/)[0]);
+            
+            const order = {
+                id: parseInt(orderId),
+                numero_ordine: numeroOrdine,
+                codice_ordine: `ORD-${numeroOrdine}`,
+                nome_cliente: customerNameElement.textContent.trim(),
+                email_cliente: customerEmailElement ? customerEmailElement.textContent.trim() : '',
+                data_ordine: dataOrdine,
+                num_prodotti: numProdotti,
+                totale: totale,
+                stato: statusSelect ? statusSelect.value : 'on-hold',
+                row: row // Mantieni il riferimento alla riga DOM originale
+            };
+            
+            currentOrders.push(order);
+        }
+    });
+    
+    filteredOrders = [...currentOrders];
+    calculateOriginalStatistics();
+    updateOrdersDisplay();
+}
+
+// ===== EVENT LISTENERS =====
+function setupEventListeners() {
+    // Form di filtraggio
+    const filterForm = document.getElementById('filterForm');
+    if (filterForm) {
+        filterForm.addEventListener('submit', handleFilterSubmit);
+    }
+    
+    // Input di ricerca in tempo reale
+    const orderCodeInput = document.getElementById('orderCode');
+    if (orderCodeInput) {
+        orderCodeInput.addEventListener('input', debounce(handleSearchInput, 300));
+    }
+    
+    // Filtro stato
+    const statusFilter = document.getElementById('statusFilter');
+    if (statusFilter) {
+        statusFilter.addEventListener('change', handleStatusChange);
+    }
+    
+    // Filtri data
+    const dateFromInput = document.getElementById('dateFrom');
+    const dateToInput = document.getElementById('dateTo');
+    
+    if (dateFromInput) {
+        dateFromInput.addEventListener('change', handleDateRangeChange);
+    }
+    
+    if (dateToInput) {
+        dateToInput.addEventListener('change', handleDateRangeChange);
+    }
+    
+    // Reset filtri
+    setupResetButton();
+}
+
+// ===== GESTIONE EVENTI =====
+function handleFilterSubmit(event) {
+    event.preventDefault();
+    
+    showLoadingState();
+    
+    // Raccoglie i valori dei filtri
+    const filters = getFilterValues();
+    
+    // Applica i filtri
+    applyFiltersWithParams(filters);
+    
+    // Aggiorna la URL senza ricaricare la pagina
+    updateURLWithFilters(filters);
+    
+    hideLoadingState();
+}
+
+function handleSearchInput(event) {
+    const searchTerm = event.target.value.trim();
+    
+    if (searchTerm.length === 0 || searchTerm.length >= 2) {
+        const filters = getFilterValues();
+        applyFiltersWithParams(filters);
+    }
+}
+
+function handleStatusChange(event) {
+    const filters = getFilterValues();
+    applyFiltersWithParams(filters);
+    updateURLWithFilters(filters);
+}
+
+function handleDateRangeChange() {
+    const filters = getFilterValues();
+    
+    // Validazione range date
+    if (validateDateRange(filters.dateFrom, filters.dateTo)) {
+        applyFiltersWithParams(filters);
+        updateURLWithFilters(filters);
+    }
+}
+
+// ===== GESTIONE FILTRI =====
+function getFilterValues() {
+    return {
+        orderCode: document.getElementById('orderCode')?.value.trim() || '',
+        status: document.getElementById('statusFilter')?.value || '',
+        dateFrom: document.getElementById('dateFrom')?.value || '',
+        dateTo: document.getElementById('dateTo')?.value || ''
+    };
+}
+
+function applyFilters() {
+    const filters = getFilterValues();
+    applyFiltersWithParams(filters);
+}
+
+function applyFiltersWithParams(filters) {
+    showLoadingState();
+    
+    setTimeout(() => {
+        filterOrders(filters);
+        updateOrdersDisplay();
+        // Non aggiorniamo più le statistiche qui - rimangono fisse
+        hideLoadingState();
+    }, 300);
+}
+
+function filterOrders(filters) {
+    filteredOrders = currentOrders.filter(order => {
+        // Filtro per codice ordine o nome cliente
+        if (filters.orderCode) {
+            const searchTerm = filters.orderCode.toLowerCase();
+            const orderMatch = order.numero_ordine.toString().includes(searchTerm) ||
+                             order.codice_ordine.toLowerCase().includes(searchTerm);
+            const customerMatch = order.nome_cliente.toLowerCase().includes(searchTerm) ||
+                                (order.email_cliente && order.email_cliente.toLowerCase().includes(searchTerm));
+            
+            if (!orderMatch && !customerMatch) {
+                return false;
+            }
+        }
+        
+        // Filtro per stato
+        if (filters.status && order.stato !== filters.status) {
+            return false;
+        }
+        
+        // Filtro per data
+        if (filters.dateFrom) {
+            const orderDate = new Date(order.data_ordine);
+            const fromDate = new Date(filters.dateFrom);
+            if (orderDate < fromDate) {
+                return false;
+            }
+        }
+        
+        if (filters.dateTo) {
+            const orderDate = new Date(order.data_ordine);
+            const toDate = new Date(filters.dateTo);
+            toDate.setHours(23, 59, 59, 999); // Include tutto il giorno
+            if (orderDate > toDate) {
+                return false;
+            }
+        }
+        
+        return true;
+    });
+    
+    // Reset della paginazione
+    currentPage = 1;
+}
+
+// ===== VISUALIZZAZIONE ORDINI =====
+function updateOrdersDisplay() {
+    const tableBody = document.querySelector('.orders-table tbody');
+    if (!tableBody) return;
+    
+    // Nascondi tutte le righe esistenti
+    const allRows = document.querySelectorAll('.order-row');
+    allRows.forEach(row => row.style.display = 'none');
+    
+    // Calcola gli ordini per la pagina corrente
+    const startIndex = (currentPage - 1) * ordersPerPage;
+    const endIndex = startIndex + ordersPerPage;
+    const ordersToShow = filteredOrders.slice(startIndex, endIndex);
+    
+    if (ordersToShow.length === 0) {
+        showEmptyState(tableBody);
+    } else {
+        hideEmptyState();
+        // Mostra solo le righe filtrate
+        ordersToShow.forEach(order => {
+            if (order.row) {
+                order.row.style.display = '';
+            }
+        });
+    }
+    
+    updatePagination();
+    updateTableHeader();
+}
+
+function showEmptyState(tableBody) {
+    const filters = getFilterValues();
+    const hasFilters = hasActiveFilters();
+    
+    // Rimuovi stato vuoto esistente
+    const existingEmptyState = document.querySelector('.empty-state-row');
+    if (existingEmptyState) {
+        existingEmptyState.remove();
+    }
+    
+    const emptyRow = document.createElement('tr');
+    emptyRow.className = 'empty-state-row';
+    emptyRow.innerHTML = `
+        <td colspan="7">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>${hasFilters ? 'Nessun ordine trovato con i filtri selezionati.' : 'Nessun ordine presente.'}</p>
+                ${hasFilters ? `
+                    <button onclick="clearAllFilters()" class="btn btn-outline-primary">
+                        <i class="fas fa-refresh me-1"></i>Visualizza Tutti gli Ordini
+                    </button>
+                ` : ''}
+            </div>
+        </td>
+    `;
+    
+    tableBody.appendChild(emptyRow);
+}
+
+function hideEmptyState() {
+    const existingEmptyState = document.querySelector('.empty-state-row');
+    if (existingEmptyState) {
+        existingEmptyState.remove();
+    }
+}
+
+// ===== PAGINAZIONE =====
+function updatePagination() {
+    const paginationContainer = document.querySelector('.pagination');
+    if (!paginationContainer) return;
+    
+    const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+    
+    if (totalPages <= 1) {
+        paginationContainer.parentElement.style.display = 'none';
+        return;
+    }
+    
+    paginationContainer.parentElement.style.display = 'block';
+    paginationContainer.innerHTML = generatePaginationHTML(totalPages);
+}
+
+function generatePaginationHTML(totalPages) {
+    let html = '';
+    
+    // Pulsante Precedente
+    if (currentPage > 1) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="goToPage(${currentPage - 1})">
+                    <i class="fas fa-chevron-left"></i> Precedente
+                </a>
+            </li>
+        `;
+    } else {
+        html += `
+            <li class="page-item disabled">
+                <span class="page-link">
+                    <i class="fas fa-chevron-left"></i> Precedente
+                </span>
+            </li>
+        `;
+    }
+    
+    // Numeri di pagina
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        if (i === currentPage) {
+            html += `
+                <li class="page-item active">
+                    <span class="page-link">${i}</span>
+                </li>
+            `;
+        } else {
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="goToPage(${i})">${i}</a>
+                </li>
+            `;
+        }
+    }
+    
+    // Pulsante Successivo
+    if (currentPage < totalPages) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="goToPage(${currentPage + 1})">
+                    Successivo <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += `
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Successivo <i class="fas fa-chevron-right"></i>
+                </span>
+            </li>
+        `;
+    }
+    
+    return html;
+}
+
+function goToPage(page) {
+    currentPage = page;
+    updateOrdersDisplay();
+    
+    // Scroll alla tabella
+    const tableContainer = document.querySelector('.orders-table-container');
+    if (tableContainer) {
+        tableContainer.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    }
+}
+
+// ===== STATISTICHE FISSE =====
+function calculateOriginalStatistics() {
+    const totalOrders = currentOrders.length;
+    const ordersInWaiting = currentOrders.filter(o => o.stato === 'on-hold').length;
+    const monthlyRevenue = calculateMonthlyRevenue(currentOrders);
+    
+    originalStatistics = {
+        totalOrders,
+        ordersInWaiting,
+        monthlyRevenue
+    };
+    
+    // Aggiorna i contatori una sola volta con i valori originali
+    updateStatElement('.stat-item:nth-child(1) .stat-number', totalOrders);
+    updateStatElement('.stat-item:nth-child(2) .stat-number', ordersInWaiting);
+    updateStatElement('.stat-item:nth-child(3) .stat-number', `€${monthlyRevenue.toFixed(0)}`);
+}
+
+function updateStatElement(selector, value) {
+    const element = document.querySelector(selector);
+    if (element) {
+        // Semplice aggiornamento senza animazione per evitare flickering
+        if (typeof value === 'string' && value.includes('€')) {
+            element.textContent = value;
+        } else {
+            element.textContent = value;
+        }
+    }
+}
+
+function calculateMonthlyRevenue(orders) {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    return orders
+        .filter(order => {
+            const orderDate = new Date(order.data_ordine);
+            return orderDate.getMonth() === currentMonth && 
+                   orderDate.getFullYear() === currentYear &&
+                   order.stato === 'completed';
+        })
+        .reduce((total, order) => total + order.totale, 0);
+}
+
+// ===== GESTIONE URL E STATO =====
+function updateURLWithFilters(filters) {
+    const url = new URL(window.location);
+    const params = url.searchParams;
+    
+    // Rimuovi tutti i parametri di filtro esistenti
+    params.delete('codice_ordine');
+    params.delete('stato');
+    params.delete('date_from');
+    params.delete('date_to');
+    params.delete('page');
+    
+    // Aggiungi i nuovi parametri se non vuoti
+    if (filters.orderCode) params.set('codice_ordine', filters.orderCode);
+    if (filters.status) params.set('stato', filters.status);
+    if (filters.dateFrom) params.set('date_from', filters.dateFrom);
+    if (filters.dateTo) params.set('date_to', filters.dateTo);
+    
+    // Aggiorna la URL senza ricaricare la pagina
+    window.history.pushState({}, '', url);
+}
+
+function setFiltersFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    
+    // Imposta i valori dei filtri dai parametri URL
+    setInputValue('orderCode', params.get('codice_ordine'));
+    setInputValue('statusFilter', params.get('stato'));
+    setInputValue('dateFrom', params.get('date_from'));
+    setInputValue('dateTo', params.get('date_to'));
+}
+
+function setInputValue(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element && value) {
+        element.value = value;
+    }
+}
+
+function hasActiveFilters() {
+    const filters = getFilterValues();
+    return filters.orderCode || filters.status || filters.dateFrom || filters.dateTo;
+}
+
+// ===== RESET FILTRI =====
+function setupResetButton() {
+    const resetButton = document.querySelector('a[href="?"]');
+    if (resetButton) {
+        resetButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            clearAllFilters();
+        });
+    }
+}
+
+function clearAllFilters() {
+    // Resetta tutti i campi del form
+    const orderCodeInput = document.getElementById('orderCode');
+    const statusFilterInput = document.getElementById('statusFilter');
+    const dateFromInput = document.getElementById('dateFrom');
+    const dateToInput = document.getElementById('dateTo');
+    
+    if (orderCodeInput) orderCodeInput.value = '';
+    if (statusFilterInput) statusFilterInput.value = '';
+    if (dateFromInput) dateFromInput.value = '';
+    if (dateToInput) dateToInput.value = '';
+    
+    // Rimuovi parametri dalla URL
+    const url = new URL(window.location);
+    url.search = '';
+    window.history.pushState({}, '', url);
+    
+    // Riapplica i filtri (che ora sono vuoti)
+    filteredOrders = [...currentOrders];
+    currentPage = 1;
+    updateOrdersDisplay();
+    
+    showToast('Filtri rimossi con successo', 'success');
+}
+
+// ===== FUNZIONI DI UTILITÀ =====
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function validateDateRange(dateFrom, dateTo) {
+    if (!dateFrom || !dateTo) return true;
+    
+    const fromDate = new Date(dateFrom);
+    const toDate = new Date(dateTo);
+    
+    if (fromDate > toDate) {
+        showToast('La data di inizio non può essere successiva alla data di fine', 'error');
+        return false;
+    }
+    
+    return true;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('it-IT');
+}
+
+function formatTime(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+}
+
+function updateTableHeader() {
+    const tableTitle = document.querySelector('.table-title small');
+    if (tableTitle) {
+        if (hasActiveFilters()) {
+            tableTitle.textContent = '(Filtrata)';
+            tableTitle.style.display = 'inline';
+        } else {
+            tableTitle.style.display = 'none';
+        }
+    }
+}
+
+// ===== STATI DI CARICAMENTO =====
+function showLoadingState() {
+    const tableContainer = document.querySelector('.orders-table-container');
+    if (tableContainer) {
+        tableContainer.classList.add('loading');
+    }
+}
+
+function hideLoadingState() {
+    const tableContainer = document.querySelector('.orders-table-container');
+    if (tableContainer) {
+        tableContainer.classList.remove('loading');
+    }
+}
+
+// ===== NOTIFICHE =====
+function showToast(message, type = 'info') {
+    // Verifica se Bootstrap è disponibile
+    if (typeof bootstrap === 'undefined') {
+        // Fallback per browser senza Bootstrap
+        alert(message);
+        return;
+    }
+    
+    // Crea un toast bootstrap se non esiste già
+    const toastContainer = document.querySelector('.toast-container') || createToastContainer();
+    
+    const toastId = 'toast-' + Date.now();
+    const toast = document.createElement('div');
+    toast.id = toastId;
+    toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+    bsToast.show();
+    
+    // Rimuovi il toast dopo che è stato nascosto
+    toast.addEventListener('hidden.bs.toast', function() {
+        toast.remove();
+    });
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    container.style.zIndex = '1060';
+    document.body.appendChild(container);
+    return container;
+}
+
+// ===== FUNZIONI PER COMPATIBILITÀ CON IL TEMPLATE ESISTENTE =====
+
+// Funzione per aggiornare lo stato dell'ordine
+function updateOrderStatus(selectElement) {
+    const form = selectElement.closest('form');
+    const orderId = form.querySelector('input[name="order_id"]').value;
+    const newStatus = selectElement.value;
+    
+    // Aggiorna la classe CSS del select
+    selectElement.className = selectElement.className.replace(/status-\w+/, `status-${newStatus}`);
+    
+    // Aggiorna l'ordine nell'array locale
+    const order = currentOrders.find(o => o.id == orderId);
+    if (order) {
+        order.stato = newStatus;
+    }
+    
+    // Ricalcola le statistiche originali con i nuovi stati
+    calculateOriginalStatistics();
+    
+    // --- INVIA LA MODIFICA AL BACKEND ---
+    const updateUrl = selectElement.dataset.url;
+    fetch(updateUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(), // Funzione da definire per recuperare il token
+        },
+        body: JSON.stringify({ nuovo_stato: newStatus }) //
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Errore nel salvataggio sul server');
+        return response.json();
+    })
+    .then(data => {
+        showToast('Stato ordine aggiornato con successo', 'success');
+        console.log(`Ordine ${orderId} aggiornato a ${newStatus}`);
+    })
+    .catch(error => {
+        console.error(error);
+        showToast('Errore nel salvataggio dello stato', 'error');
+    });
+}
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
+// Funzione per visualizzare i dettagli dell'ordine
+function viewOrderDetails(orderNumber) {
+    const modal = document.getElementById('orderDetailsModal');
+    if (!modal) return;
+    
+    const bsModal = new bootstrap.Modal(modal);
+    const modalOrderId = document.getElementById('modalOrderId');
+    if (modalOrderId) {
+        modalOrderId.textContent = orderNumber.toString().padStart(5, '0');
+    }
+    
+    // Trova l'ordine nei dati locali
+    const order = currentOrders.find(o => o.numero_ordine == orderNumber);
+    
+    const content = document.getElementById('orderDetailsContent');
+    if (content) {
+        if (order) {
+            content.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Informazioni Cliente</h6>
+                        <p><strong>Nome:</strong> ${order.nome_cliente}</p>
+                        <p><strong>Email:</strong> ${order.email_cliente}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Dettagli Ordine</h6>
+                        <p><strong>Data:</strong> ${formatDate(order.data_ordine)}</p>
+                        <p><strong>Totale:</strong> €${order.totale.toFixed(2)}</p>
+                        <p><strong>Stato:</strong> ${getStatusLabel(order.stato)}</p>
+                        <p><strong>Prodotti:</strong> ${order.num_prodotti}</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            content.innerHTML = `
+                <div class="text-center py-4">
+                    <p class="text-muted">Dettagli ordine non disponibili</p>
+                </div>
+            `;
+        }
+    }
+    
+    bsModal.show();
+}
+
+function getStatusLabel(status) {
+    const statusLabels = {
+        'on-hold': 'In attesa',
+        'completed': 'Completato',
+        'cancelled': 'Cancellato',
+        'refunded': 'Rimborsato'
+    };
+    return statusLabels[status] || status;
+}
+
+function printOrderFromModal() {
+    window.print();
+}
+console.log('Sistema di filtraggio ordini caricato e pronto!');
+
+</script>
+{% endblock %}

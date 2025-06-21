@@ -28,5 +28,6 @@ urlpatterns = [
     path('profilo/modifica/', views.modifica_dati_utente, name='modifica_dati_utente'),
     path('aggiungi_indirizzo', views.aggiungi_indirizzo, name='aggiungi_indirizzo'),
     path('novita', views.novita, name='novita'),
-
+    path('amministrazione', views.amministrazione, name='amministrazione'),
+    path('amministrazione/<int:ordine_id>/aggiorna_stato/', views.aggiorna_stato_ordine, name='aggiorna_stato_ordine'),
 ]

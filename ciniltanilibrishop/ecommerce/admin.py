@@ -48,6 +48,15 @@ class OrdineAdmin(admin.ModelAdmin):
     inlines = [ElementoOrdineInline]
     readonly_fields = ['data_ordine', 'data_pagamento']  # opzionale, se le imposti da codice
 
+    fieldsets = (
+        (None, {
+            'fields': ('numero_ordine', 'utente', 'totale')
+        }),
+        ('Stato e Pagamento', {
+            'fields': ('stato', 'data_ordine', 'data_pagamento')
+        }),
+    )
+    
 @admin.register(ElementoOrdine)
 class ElementoOrdineAdmin(admin.ModelAdmin):
     list_display = ['ordine', 'prodotto', 'quantita', 'prezzo_unitario']
