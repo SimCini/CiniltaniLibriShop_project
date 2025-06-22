@@ -178,6 +178,7 @@
 
   .carousel-inner {
     padding: 20px 0;
+    overflow-x: auto;
   }
 
   .img-box img {
@@ -197,6 +198,20 @@
   .scopri-piu-btn:hover {
     background-color: #3E3380; 
     border-color: #3E3380;
+  }
+
+  .category-card, .img-box, .carousel-item > div {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .container, .row, .col-md-* {
+    overflow-x: hidden;
   }
 </style>
 

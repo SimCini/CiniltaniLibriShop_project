@@ -415,7 +415,7 @@ def aggiungi_indirizzo(request):
 def amministrazione(request):
     oggi = datetime.today()
     ordini = Ordine.objects.all()
-    ordini_in_attesa = Ordine.objects.filter(stato='in_attesa')
+    ordini_in_attesa = Ordine.objects.filter(stato='on-hold')
 
     # Ricavo del mese corrente
     ordini_mensili = Ordine.objects.filter(

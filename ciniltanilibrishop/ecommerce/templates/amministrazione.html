@@ -374,10 +374,17 @@ body {
   font-size: 0.9rem;
 }
 
-.customer-email {
+.customer-email,
+.customer-indirizzo,
+.customer-citta,
+.customer-cap,
+.customer-paese {
   color: #666;
-  font-style: italic;
   font-size: 0.75rem;
+}
+
+.customer-email {
+  font-style: italic;
 }
 
 .products-badge {
@@ -737,8 +744,8 @@ html, body {
     <p class="admin-subtitle">Pannello Amministratore</p>
   </div>
 </div>
-<a href="javascript:history.back()" class="back-link">
-    ← Torna indietro
+<a href="{% url 'ecommerce:profilo_utente'%}" class="back-link">
+    ← Torna al profilo
 </a>
 
 <!-- Filtri e Statistiche -->
@@ -997,7 +1004,6 @@ html, body {
 {% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
-// ===== SISTEMA DI FILTRAGGIO ORDINI =====
 
 // Variabili globali per la gestione dello stato
 let currentOrders = [];
@@ -1046,30 +1052,65 @@ function loadOrdersFromDOM() {
         
         if (orderNumberElement && customerNameElement && orderDateElement) {
             // Estrai il numero ordine dal testo (rimuovi # e zeri iniziali)
-            const numeroOrdine = parseInt(orderNumberElement.textContent.replace('#', '').replace(/^0+/, ''));
+            const numeroOrdineText = orderNumberElement.textContent.replace('#', '').trim();
+            const numeroOrdine = parseInt(numeroOrdineText.replace(/^0+/, '')) || parseInt(numeroOrdineText);
             
-            // Estrai la data dall'elemento (prendi solo la prima riga, prima del <br>)
-            const dateText = orderDateElement.childNodes[0].textContent.trim();
-            const timeText = orderDateElement.querySelector('small') ? 
-                orderDateElement.querySelector('small').textContent : '00:00';
+            // Estrai la data dall'elemento
+            let dateText = '';
+            let timeText = '00:00';
             
-            // Converti la data italiana in formato ISO
-            const [day, month, year] = dateText.split('/');
-            const [hours, minutes] = timeText.split(':');
-            const dataOrdine = new Date(year, month - 1, day, hours, minutes).toISOString();
+            // Cerca il testo della data nel primo nodo di testo
+            const firstTextNode = Array.from(orderDateElement.childNodes).find(node => 
+                node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+            );
+            
+            if (firstTextNode) {
+                dateText = firstTextNode.textContent.trim();
+            }
+            
+            // Cerca l'orario nell'elemento small
+            const timeElement = orderDateElement.querySelector('small');
+            if (timeElement) {
+                timeText = timeElement.textContent.trim();
+            }
+            
+            // Converti la data italiana in formato ISO se presente
+            let dataOrdine = new Date().toISOString(); // Fallback
+            if (dateText && dateText.includes('/')) {
+                try {
+                    const [day, month, year] = dateText.split('/');
+                    const [hours, minutes] = timeText.split(':');
+                    dataOrdine = new Date(year, month - 1, day, hours, minutes).toISOString();
+                } catch (e) {
+                    console.warn('Errore nel parsing della data:', dateText, timeText);
+                }
+            }
             
             // Estrai il totale (rimuovi € e converti)
-            const totale = parseFloat(totalElement.textContent.replace('€', '').replace(',', '.'));
+            let totale = 0;
+            if (totalElement && totalElement.textContent) {
+                const totaleText = totalElement.textContent.replace('€', '').replace(',', '.').trim();
+                totale = parseFloat(totaleText) || 0;
+            }
             
             // Estrai il numero di prodotti
-            const numProdotti = parseInt(productsCountElement.textContent.match(/\d+/)[0]);
+            let numProdotti = 1;
+            if (productsCountElement && productsCountElement.textContent) {
+                const match = productsCountElement.textContent.match(/\d+/);
+                if (match) {
+                    numProdotti = parseInt(match[0]);
+                }
+            }
+            
+            // Estrai email cliente se presente
+            const emailCliente = customerEmailElement ? customerEmailElement.textContent.trim() : '';
             
             const order = {
                 id: parseInt(orderId),
                 numero_ordine: numeroOrdine,
-                codice_ordine: `ORD-${numeroOrdine}`,
+                codice_ordine: `#${numeroOrdineText}`,
                 nome_cliente: customerNameElement.textContent.trim(),
-                email_cliente: customerEmailElement ? customerEmailElement.textContent.trim() : '',
+                email_cliente: emailCliente,
                 data_ordine: dataOrdine,
                 num_prodotti: numProdotti,
                 totale: totale,
@@ -1082,8 +1123,15 @@ function loadOrdersFromDOM() {
     });
     
     filteredOrders = [...currentOrders];
+    console.log('Caricati', currentOrders.length, 'ordini dal DOM');
     calculateOriginalStatistics();
-    updateOrdersDisplay();
+    
+    // Solo se ci sono filtri attivi, applicali
+    if (hasActiveFilters()) {
+        applyFilters();
+    } else {
+        updateOrdersDisplay();
+    }
 }
 
 // ===== EVENT LISTENERS =====
@@ -1186,9 +1234,8 @@ function applyFiltersWithParams(filters) {
     setTimeout(() => {
         filterOrders(filters);
         updateOrdersDisplay();
-        // Non aggiorniamo più le statistiche qui - rimangono fisse
         hideLoadingState();
-    }, 300);
+    }, 100);
 }
 
 function filterOrders(filters) {
@@ -1215,6 +1262,7 @@ function filterOrders(filters) {
         if (filters.dateFrom) {
             const orderDate = new Date(order.data_ordine);
             const fromDate = new Date(filters.dateFrom);
+            fromDate.setHours(0, 0, 0, 0);
             if (orderDate < fromDate) {
                 return false;
             }
@@ -1234,6 +1282,7 @@ function filterOrders(filters) {
     
     // Reset della paginazione
     currentPage = 1;
+    console.log('Filtrati', filteredOrders.length, 'ordini su', currentOrders.length);
 }
 
 // ===== VISUALIZZAZIONE ORDINI =====
@@ -1241,20 +1290,23 @@ function updateOrdersDisplay() {
     const tableBody = document.querySelector('.orders-table tbody');
     if (!tableBody) return;
     
-    // Nascondi tutte le righe esistenti
-    const allRows = document.querySelectorAll('.order-row');
+    // Nascondi tutte le righe esistenti incluso lo stato vuoto
+    const allRows = document.querySelectorAll('.order-row, .empty-state-row');
     allRows.forEach(row => row.style.display = 'none');
     
-    // Calcola gli ordini per la pagina corrente
-    const startIndex = (currentPage - 1) * ordersPerPage;
-    const endIndex = startIndex + ordersPerPage;
-    const ordersToShow = filteredOrders.slice(startIndex, endIndex);
+    // Rimuovi eventuali righe di stato vuoto esistenti
+    const existingEmptyRows = document.querySelectorAll('.empty-state-row');
+    existingEmptyRows.forEach(row => row.remove());
     
-    if (ordersToShow.length === 0) {
+    if (filteredOrders.length === 0) {
         showEmptyState(tableBody);
     } else {
-        hideEmptyState();
-        // Mostra solo le righe filtrate
+        // Calcola gli ordini per la pagina corrente
+        const startIndex = (currentPage - 1) * ordersPerPage;
+        const endIndex = startIndex + ordersPerPage;
+        const ordersToShow = filteredOrders.slice(startIndex, endIndex);
+        
+        // Mostra solo le righe filtrate per la pagina corrente
         ordersToShow.forEach(order => {
             if (order.row) {
                 order.row.style.display = '';
@@ -1267,14 +1319,7 @@ function updateOrdersDisplay() {
 }
 
 function showEmptyState(tableBody) {
-    const filters = getFilterValues();
     const hasFilters = hasActiveFilters();
-    
-    // Rimuovi stato vuoto esistente
-    const existingEmptyState = document.querySelector('.empty-state-row');
-    if (existingEmptyState) {
-        existingEmptyState.remove();
-    }
     
     const emptyRow = document.createElement('tr');
     emptyRow.className = 'empty-state-row';
@@ -1295,13 +1340,6 @@ function showEmptyState(tableBody) {
     tableBody.appendChild(emptyRow);
 }
 
-function hideEmptyState() {
-    const existingEmptyState = document.querySelector('.empty-state-row');
-    if (existingEmptyState) {
-        existingEmptyState.remove();
-    }
-}
-
 // ===== PAGINAZIONE =====
 function updatePagination() {
     const paginationContainer = document.querySelector('.pagination');
@@ -1310,11 +1348,18 @@ function updatePagination() {
     const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
     
     if (totalPages <= 1) {
-        paginationContainer.parentElement.style.display = 'none';
+        const paginationNav = paginationContainer.closest('nav');
+        if (paginationNav) {
+            paginationNav.style.display = 'none';
+        }
         return;
     }
     
-    paginationContainer.parentElement.style.display = 'block';
+    const paginationNav = paginationContainer.closest('nav');
+    if (paginationNav) {
+        paginationNav.style.display = 'block';
+    }
+    
     paginationContainer.innerHTML = generatePaginationHTML(totalPages);
 }
 
@@ -1325,7 +1370,7 @@ function generatePaginationHTML(totalPages) {
     if (currentPage > 1) {
         html += `
             <li class="page-item">
-                <a class="page-link" href="#" onclick="goToPage(${currentPage - 1})">
+                <a class="page-link" href="#" onclick="goToPage(${currentPage - 1}); return false;">
                     <i class="fas fa-chevron-left"></i> Precedente
                 </a>
             </li>
@@ -1354,7 +1399,7 @@ function generatePaginationHTML(totalPages) {
         } else {
             html += `
                 <li class="page-item">
-                    <a class="page-link" href="#" onclick="goToPage(${i})">${i}</a>
+                    <a class="page-link" href="#" onclick="goToPage(${i}); return false;">${i}</a>
                 </li>
             `;
         }
@@ -1364,7 +1409,7 @@ function generatePaginationHTML(totalPages) {
     if (currentPage < totalPages) {
         html += `
             <li class="page-item">
-                <a class="page-link" href="#" onclick="goToPage(${currentPage + 1})">
+                <a class="page-link" href="#" onclick="goToPage(${currentPage + 1}); return false;">
                     Successivo <i class="fas fa-chevron-right"></i>
                 </a>
             </li>
@@ -1398,6 +1443,8 @@ function goToPage(page) {
 
 // ===== STATISTICHE FISSE =====
 function calculateOriginalStatistics() {
+    if (currentOrders.length === 0) return;
+    
     const totalOrders = currentOrders.length;
     const ordersInWaiting = currentOrders.filter(o => o.stato === 'on-hold').length;
     const monthlyRevenue = calculateMonthlyRevenue(currentOrders);
@@ -1408,7 +1455,7 @@ function calculateOriginalStatistics() {
         monthlyRevenue
     };
     
-    // Aggiorna i contatori una sola volta con i valori originali
+    // Aggiorna i contatori con i valori originali
     updateStatElement('.stat-item:nth-child(1) .stat-number', totalOrders);
     updateStatElement('.stat-item:nth-child(2) .stat-number', ordersInWaiting);
     updateStatElement('.stat-item:nth-child(3) .stat-number', `€${monthlyRevenue.toFixed(0)}`);
@@ -1417,12 +1464,7 @@ function calculateOriginalStatistics() {
 function updateStatElement(selector, value) {
     const element = document.querySelector(selector);
     if (element) {
-        // Semplice aggiornamento senza animazione per evitare flickering
-        if (typeof value === 'string' && value.includes('€')) {
-            element.textContent = value;
-        } else {
-            element.textContent = value;
-        }
+        element.textContent = value;
     }
 }
 
@@ -1486,13 +1528,18 @@ function hasActiveFilters() {
 
 // ===== RESET FILTRI =====
 function setupResetButton() {
-    const resetButton = document.querySelector('a[href="?"]');
-    if (resetButton) {
-        resetButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            clearAllFilters();
-        });
-    }
+    // Cerca il pulsante di reset nei diversi possibili selettori
+    const resetButtons = document.querySelectorAll('a[href="?"], .btn-reset, [onclick*="clearAllFilters"]');
+    
+    resetButtons.forEach(resetButton => {
+        if (resetButton && !resetButton.hasAttribute('data-reset-listener')) {
+            resetButton.setAttribute('data-reset-listener', 'true');
+            resetButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                clearAllFilters();
+            });
+        }
+    });
 }
 
 function clearAllFilters() {
@@ -1574,6 +1621,7 @@ function showLoadingState() {
     const tableContainer = document.querySelector('.orders-table-container');
     if (tableContainer) {
         tableContainer.classList.add('loading');
+        tableContainer.style.opacity = '0.7';
     }
 }
 
@@ -1581,42 +1629,61 @@ function hideLoadingState() {
     const tableContainer = document.querySelector('.orders-table-container');
     if (tableContainer) {
         tableContainer.classList.remove('loading');
+        tableContainer.style.opacity = '1';
     }
 }
 
 // ===== NOTIFICHE =====
 function showToast(message, type = 'info') {
     // Verifica se Bootstrap è disponibile
-    if (typeof bootstrap === 'undefined') {
+    if (typeof bootstrap !== 'undefined') {
+        // Crea un toast bootstrap se non esiste già
+        const toastContainer = document.querySelector('.toast-container') || createToastContainer();
+        
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+        bsToast.show();
+        
+        // Rimuovi il toast dopo che è stato nascosto
+        toast.addEventListener('hidden.bs.toast', function() {
+            toast.remove();
+        });
+    } else {
         // Fallback per browser senza Bootstrap
-        alert(message);
-        return;
+        console.log(`[${type.toUpperCase()}] ${message}`);
+        // Alternativa visiva semplice
+        const alertDiv = document.createElement('div');
+        alertDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'error' ? '#dc3545' : type === 'success' ? '#198754' : '#0d6efd'};
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 9999;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        `;
+        alertDiv.textContent = message;
+        document.body.appendChild(alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 3000);
     }
-    
-    // Crea un toast bootstrap se non esiste già
-    const toastContainer = document.querySelector('.toast-container') || createToastContainer();
-    
-    const toastId = 'toast-' + Date.now();
-    const toast = document.createElement('div');
-    toast.id = toastId;
-    toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} border-0`;
-    toast.setAttribute('role', 'alert');
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">${message}</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    `;
-    
-    toastContainer.appendChild(toast);
-    
-    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
-    bsToast.show();
-    
-    // Rimuovi il toast dopo che è stato nascosto
-    toast.addEventListener('hidden.bs.toast', function() {
-        toast.remove();
-    });
 }
 
 function createToastContainer() {
@@ -1636,12 +1703,17 @@ function updateOrderStatus(selectElement) {
     const newStatus = selectElement.value;
     
     // Aggiorna la classe CSS del select
-    selectElement.className = selectElement.className.replace(/status-\w+/, `status-${newStatus}`);
+    selectElement.className = selectElement.className.replace(/status-\w+/g, '') + ` status-${newStatus}`;
     
     // Aggiorna l'ordine nell'array locale
     const order = currentOrders.find(o => o.id == orderId);
     if (order) {
         order.stato = newStatus;
+        // Se l'ordine è attualmente filtrato, aggiorna anche quello
+        const filteredOrder = filteredOrders.find(o => o.id == orderId);
+        if (filteredOrder) {
+            filteredOrder.stato = newStatus;
+        }
     }
     
     // Ricalcola le statistiche originali con i nuovi stati
@@ -1649,29 +1721,38 @@ function updateOrderStatus(selectElement) {
     
     // --- INVIA LA MODIFICA AL BACKEND ---
     const updateUrl = selectElement.dataset.url;
-    fetch(updateUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(), // Funzione da definire per recuperare il token
-        },
-        body: JSON.stringify({ nuovo_stato: newStatus }) //
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('Errore nel salvataggio sul server');
-        return response.json();
-    })
-    .then(data => {
-        showToast('Stato ordine aggiornato con successo', 'success');
-        console.log(`Ordine ${orderId} aggiornato a ${newStatus}`);
-    })
-    .catch(error => {
-        console.error(error);
-        showToast('Errore nel salvataggio dello stato', 'error');
-    });
+    if (updateUrl) {
+        fetch(updateUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({ nuovo_stato: newStatus })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Errore nel salvataggio sul server');
+            return response.json();
+        })
+        .then(data => {
+            showToast('Stato ordine aggiornato con successo', 'success');
+            console.log(`Ordine ${orderId} aggiornato a ${newStatus}`);
+        })
+        .catch(error => {
+            console.error(error);
+            showToast('Errore nel salvataggio dello stato', 'error');
+            // Ripristina il valore precedente in caso di errore
+            if (order) {
+                selectElement.value = order.stato;
+                selectElement.className = selectElement.className.replace(/status-\w+/g, '') + ` status-${order.stato}`;
+            }
+        });
+    }
 }
+
 function getCSRFToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    return csrfInput ? csrfInput.value : '';
 }
 
 // Funzione per visualizzare i dettagli dell'ordine
@@ -1679,7 +1760,11 @@ function viewOrderDetails(orderNumber) {
     const modal = document.getElementById('orderDetailsModal');
     if (!modal) return;
     
-    const bsModal = new bootstrap.Modal(modal);
+    let bsModal;
+    if (typeof bootstrap !== 'undefined') {
+        bsModal = new bootstrap.Modal(modal);
+    }
+    
     const modalOrderId = document.getElementById('modalOrderId');
     if (modalOrderId) {
         modalOrderId.textContent = orderNumber.toString().padStart(5, '0');
@@ -1701,6 +1786,7 @@ function viewOrderDetails(orderNumber) {
                     <div class="col-md-6">
                         <h6 class="text-primary">Dettagli Ordine</h6>
                         <p><strong>Data:</strong> ${formatDate(order.data_ordine)}</p>
+                        <p><strong>Ora:</strong> ${formatTime(order.data_ordine)}</p>
                         <p><strong>Totale:</strong> €${order.totale.toFixed(2)}</p>
                         <p><strong>Stato:</strong> ${getStatusLabel(order.stato)}</p>
                         <p><strong>Prodotti:</strong> ${order.num_prodotti}</p>
@@ -1716,7 +1802,13 @@ function viewOrderDetails(orderNumber) {
         }
     }
     
-    bsModal.show();
+    if (bsModal) {
+        bsModal.show();
+    } else {
+        // Fallback per mostrare il modal senza Bootstrap
+        modal.style.display = 'block';
+        modal.classList.add('show');
+    }
 }
 
 function getStatusLabel(status) {
@@ -1732,7 +1824,7 @@ function getStatusLabel(status) {
 function printOrderFromModal() {
     window.print();
 }
-console.log('Sistema di filtraggio ordini caricato e pronto!');
 
+console.log('Sistema di filtraggio ordini caricato e pronto!');
 </script>
 {% endblock %}
