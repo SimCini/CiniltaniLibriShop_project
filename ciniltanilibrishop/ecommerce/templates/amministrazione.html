@@ -868,6 +868,9 @@ html, body {
                 {% endif %}
               </div>
               <div class="customer-email">{{ ordine.utente.email }}</div>
+              <div class="customer-indirizzo" style="display: none;">{{ ordine.utente.indirizzo }}</div>
+              <div class="customer-citta" style="display: none;">{{ ordine.utente.citta }}</div>
+              <div class="customer-cap" style="display: none;">{{ ordine.utente.cap }}</div>
             </td>
             <td class="order-date">
               {{ ordine.data_ordine|date:"d/m/Y" }}<br>
@@ -1045,6 +1048,9 @@ function loadOrdersFromDOM() {
         const orderNumberElement = row.querySelector('.order-id');
         const customerNameElement = row.querySelector('.customer-name');
         const customerEmailElement = row.querySelector('.customer-email');
+        const customerIndirizzoElement = row.querySelector('.customer-indirizzo');
+        const customerCittaElement = row.querySelector('.customer-citta');
+        const customerCapElement = row.querySelector('.customer-cap');
         const orderDateElement = row.querySelector('.order-date');
         const productsCountElement = row.querySelector('.products-badge');
         const totalElement = row.querySelector('.order-total');
@@ -1111,6 +1117,9 @@ function loadOrdersFromDOM() {
                 codice_ordine: `#${numeroOrdineText}`,
                 nome_cliente: customerNameElement.textContent.trim(),
                 email_cliente: emailCliente,
+                indirizzo_cliente: customerIndirizzoElement.textContent.trim(),
+                citta_cliente: customerCittaElement.textContent.trim(),
+                cap_cliente: customerCapElement.textContent.trim(),
                 data_ordine: dataOrdine,
                 num_prodotti: numProdotti,
                 totale: totale,
@@ -1782,6 +1791,9 @@ function viewOrderDetails(orderNumber) {
                         <h6 class="text-primary">Informazioni Cliente</h6>
                         <p><strong>Nome:</strong> ${order.nome_cliente}</p>
                         <p><strong>Email:</strong> ${order.email_cliente}</p>
+                        <p><strong>Indirizzo:</strong> ${order.indirizzo_cliente}</p>
+                        <p><strong>Città:</strong> ${order.citta_cliente}</p>
+                        <p><strong>CAP:</strong> ${order.cap_cliente}</p>
                     </div>
                     <div class="col-md-6">
                         <h6 class="text-primary">Dettagli Ordine</h6>
