@@ -232,7 +232,7 @@ function caricaContenuto(sezione, elemento) {
                             <td>{{ ordine.data_ordine|date:"d/m/Y" }}</td>
                             <td>
                                 <span class="status-badge status-{{ ordine.stato|lower }}">
-                                {{ ordine.stato }}
+                                {{ ordine.get_stato_display }}
                                 </span>
                             </td>
                             <td>€{{ ordine.totale }}</td>
